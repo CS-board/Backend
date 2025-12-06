@@ -24,28 +24,24 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final String BEARER_PREFIX = "Bearer ";
 
+    private static final String BEARER_PREFIX = "Bearer ";
     private final AuthenticationManager authenticationManager;
 
-    //
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        return authorizationHeader == null;
-    }
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        JwtUnauthenticatedToken unauthenticatedToken = new JwtUnauthenticatedToken(resolveAccessToken(request)
-                .orElseThrow(() -> new ServiceException(ErrorCode.JWT_NOT_EXIST)));
-        //검증과정
-        Authentication authentication = authenticationManager.authenticate(unauthenticatedToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        resolveAccessToken(request).ifPresent(token -> {
+            JwtUnauthenticatedToken unauthenticatedToken = new JwtUnauthenticatedToken(token);
+            Authentication authentication = authenticationManager.authenticate(unauthenticatedToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        });
 
         filterChain.doFilter(request, response);
     }
-
+    
     //헤더에서 jwt만 뽑아냄
     private Optional<String> resolveAccessToken(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
