@@ -30,7 +30,7 @@ public class UserRegisterRequest {
     private String studentId;
 
     @NotNull
-    private int grade;
+    private Integer grade;
 
     @NotBlank
     @Pattern(message = "전화번호 형식이 올바르지 않습니다.",

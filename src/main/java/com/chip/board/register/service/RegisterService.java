@@ -67,7 +67,11 @@ public class RegisterService {
         }
 
         int number = createNumber();
-        emailService.sendMail(username, number);
+        try {
+            emailService.sendAuthCodeMailAsync(username, number).join();
+        } catch (Exception e) {
+            throw new ServiceException(ErrorCode.EMAIL_SEND_ERROR);
+        }
         String key="auth:email:"+username;
         stringRedisTemplate.opsForValue().set(key, String.valueOf(number), Duration.ofMinutes(verificationCodeExpiryMinutes));
     }
