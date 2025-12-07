@@ -12,6 +12,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,7 +43,7 @@ public class EmailService {
             """;
 
     @Async
-    public void sendMail(String email, int number) {
+    public CompletableFuture<Boolean> sendAuthCodeMailAsync(String email, int number) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
             message.setFrom(senderEmail);
@@ -50,10 +52,12 @@ public class EmailService {
             String body = String.format(AUTH_CODE_EMAIL_BODY, number);
             message.setText(body,"UTF-8", "html");
             javaMailSender.send(message);
+            return CompletableFuture.completedFuture(true);
         } catch (MessagingException e) {
-            throw new ServiceException(ErrorCode.EMAIL_SEND_ERROR);
+            return CompletableFuture.failedFuture(new ServiceException(ErrorCode.EMAIL_SEND_ERROR));
         }
     }
+
 
     @Async
     public void sendPasswordMail(String username, String password) {

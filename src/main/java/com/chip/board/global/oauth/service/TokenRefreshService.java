@@ -15,6 +15,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class TokenRefreshService {
@@ -51,5 +53,22 @@ public class TokenRefreshService {
         refreshTokenRepository.save(newRefreshToken);
 
         return new TokenPair(newAccessToken, newRefreshToken);
+    }
+
+    @Transactional
+    public void logout(String rawRefreshToken) {
+        if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
+            return;
+        }
+
+        // RT로 userId 조회 (있으면 가져옴, 없어도 그냥 RT 삭제만)
+        //Optional<Long> userIdOpt = refreshTokenRepository.findUserIdByToken(rawRefreshToken);
+
+        // 해당 RT 삭제
+        refreshTokenRepository.deleteByToken(rawRefreshToken);
+
+        // 한 기기만 로그아웃: 여기까지만
+        // 모든 기기에서 로그아웃하고 싶다면:
+        // userIdOpt.ifPresent(userId -> refreshTokenRepository.deleteAllByUserId(userId));
     }
 }

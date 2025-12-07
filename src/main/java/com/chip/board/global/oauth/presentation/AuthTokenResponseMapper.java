@@ -35,4 +35,13 @@ public class AuthTokenResponseMapper {
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(ResponseUtils.createSuccessResponse(accessToken));
     }
+
+    public ResponseEntity<ResponseBody<Void>> toLogoutResponse() {
+        ResponseCookie deleteCookie = cookieUtil.deleteCookie(REFRESH_TOKEN_COOKIE_NAME);
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .body(ResponseUtils.createSuccessResponse(null));
+    }
 }
