@@ -62,7 +62,7 @@ public class TokenRefreshService {
         }
 
         // RT로 userId 조회 (있으면 가져옴, 없어도 그냥 RT 삭제만)
-        Optional<Long> userIdOpt = refreshTokenRepository.findUserIdByToken(rawRefreshToken);
+        //Optional<Long> userIdOpt = refreshTokenRepository.findUserIdByToken(rawRefreshToken);
 
         // 해당 RT 삭제
         refreshTokenRepository.deleteByToken(rawRefreshToken);

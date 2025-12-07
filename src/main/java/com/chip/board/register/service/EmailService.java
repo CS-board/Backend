@@ -52,7 +52,7 @@ public class EmailService {
             String body = String.format(AUTH_CODE_EMAIL_BODY, number);
             message.setText(body,"UTF-8", "html");
             javaMailSender.send(message);
-            return CompletableFuture.completedFuture(null);
+            return CompletableFuture.completedFuture(true);
         } catch (MessagingException e) {
             return CompletableFuture.failedFuture(new ServiceException(ErrorCode.EMAIL_SEND_ERROR));
         }

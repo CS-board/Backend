@@ -69,7 +69,7 @@ public class RegisterService {
         int number = createNumber();
         try {
             emailService.sendAuthCodeMailAsync(username, number).join();
-        } catch (Exception e) {
+        } catch (java.util.concurrent.CompletionException e) {
             throw new ServiceException(ErrorCode.EMAIL_SEND_ERROR);
         }
         String key="auth:email:"+username;

@@ -42,8 +42,6 @@ public class AuthTokenResponseMapper {
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
-                // ResponseUtils 구현에 따라 아래 둘 중 하나 사용
                 .body(ResponseUtils.createSuccessResponse(null));
-        // .body(ResponseUtils.createSuccessResponse());
     }
 }
