@@ -21,16 +21,16 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, length = 50)
     private String username;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(length = 100)
+    @Column(nullable = false, length = 100)
     private String department;
 
-    @Column(name = "student_id", length = 20)
+    @Column(name = "student_id", nullable = false, length = 20)
     private String studentId;
 
     @Column(nullable = false)
@@ -43,7 +43,7 @@ public class User {
     @Column(length = 20, nullable = false)
     private Role role;
 
-    @Column(name = "phone_number", length = 20)
+    @Column(name = "phone_number", nullable = false, length = 20)
     private String phoneNumber;
 
     @Column(name = "is_deleted")
