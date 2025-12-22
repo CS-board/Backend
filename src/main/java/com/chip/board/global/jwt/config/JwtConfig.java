@@ -7,7 +7,6 @@ import com.chip.board.global.jwt.properties.RefreshTokenProperties;
 import com.chip.board.global.jwt.token.access.AccessTokenProvider;
 import com.chip.board.global.jwt.token.refresh.OpaqueRefreshTokenProvider;
 import com.chip.board.global.jwt.token.refresh.RefreshTokenProvider;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
