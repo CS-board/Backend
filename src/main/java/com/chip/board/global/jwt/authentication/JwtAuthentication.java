@@ -17,14 +17,38 @@ public record JwtAuthentication(Long userId, String role) implements Authenticat
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //@PreAuthorize("hasRole('ADMIN')")으로 받음
         return List.of(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
-    @Override public Object getPrincipal() { return userId; }
-    @Override public Object getCredentials() { return null; }
-    @Override public Object getDetails() { return null; }
-    @Override public boolean isAuthenticated() { return true; }
-    @Override public void setAuthenticated(boolean isAuthenticated) { }
-    @Override public String getName() { return Objects.toString(userId, null); }
+    @Override
+    public Object getPrincipal() {
+        return userId;
+    }
+
+    @Override
+    public Object getCredentials() {
+        return null;
+    }
+
+    @Override
+    public Object getDetails() {
+        return null;
+    }
+
+    @Override
+    public boolean isAuthenticated() {
+        return true;
+    }
+
+    @Override
+    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+        if (!isAuthenticated) {
+            throw new IllegalArgumentException("Cannot set this token to unauthenticated");
+        }
+    }
+
+    @Override
+    public String getName() {
+        return Objects.toString(userId, null);
+    }
 }

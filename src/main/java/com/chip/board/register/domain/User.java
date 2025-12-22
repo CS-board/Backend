@@ -40,7 +40,7 @@ public class User {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(length = 20, nullable = false)
     private Role role;
 
     @Column(name = "phone_number", length = 20)
