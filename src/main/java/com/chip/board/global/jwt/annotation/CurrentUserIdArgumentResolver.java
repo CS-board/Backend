@@ -25,16 +25,18 @@ public class CurrentUserIdArgumentResolver implements HandlerMethodArgumentResol
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         CurrentUserId annotation = parameter.getParameterAnnotation(CurrentUserId.class);
-        boolean required = annotation == null || annotation.required();
+        boolean required = annotation.required();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication instanceof JwtAuthentication jwtAuthentication) {
             Object principal = jwtAuthentication.getPrincipal();
-            if (principal != null) return principal;
+            if (principal != null) {
+                return principal;
+            }
         }
 
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken || authentication instanceof JwtAuthentication) {
             if (required) {
                 throw new ServiceException(ErrorCode.NEED_AUTHORIZED);
             }
@@ -42,6 +44,6 @@ public class CurrentUserIdArgumentResolver implements HandlerMethodArgumentResol
         }
 
         log.error("알 수 없는 Authentication 타입입니다: {}", authentication.getClass());
-        throw new IllegalArgumentException("@CurrentUserId는 JWT 기반의 JwtAuthentication 또는 AnonymousAuthenticationToken 타입만 지원합니다.");
+        throw new IllegalArgumentException("@CurrentUserId는 JWT 기반의 JwtAuthentication 타입만 지원합니다.");
     }
 }
