@@ -8,6 +8,8 @@ import com.chip.board.register.domain.User;
 import com.chip.board.register.dto.request.UserRegisterRequest;
 import com.chip.board.register.dto.request.MailVerifyRequest;
 import com.chip.board.register.repository.UserRepository;
+import com.chip.board.register.repository.UserSolvedSyncStateRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +32,13 @@ public class RegisterService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final UserSolvedSyncStateService userSolvedSyncStateService;
 
     public List<String> showRegisterForm() {
         return Department.showDepartment();
     }
 
+    @Transactional
     public void register(UserRegisterRequest userRegisterRequest) {
         String key = "auth:email:" + userRegisterRequest.getUsername();
         String verificationStatus = stringRedisTemplate.opsForValue().get(key);
@@ -57,11 +61,13 @@ public class RegisterService {
                     .build();
             userRepository.save(user);
             stringRedisTemplate.delete(key);
+            userSolvedSyncStateService.createInitialSyncState(user);
         }
         catch (Exception e) {
             throw new ServiceException(ErrorCode.UNEXPECTED_SERVER_ERROR);
         }
     }
+
     public void sendMail(String username) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new ServiceException(ErrorCode.USER_ALREADY_EXIST);
