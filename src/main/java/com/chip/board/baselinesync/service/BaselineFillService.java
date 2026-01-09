@@ -48,11 +48,17 @@ public class BaselineFillService {
             return; // 다음 tick 재시도
         }
 
-        var items = (resp == null || resp.items() == null)
+        if (resp == null) {
+            log.warn("solved.ac returned null body. userId={}, handle={}, nextPage={}",
+                    t.userId(), t.bojHandle(), t.nextPage());
+            return;
+        }
+
+        var items = (resp.items() == null)
                 ? List.<SolvedAcClient.SolvedAcSearchProblemResponse.Item>of()
                 : resp.items();
 
-        int totalCount = (resp == null || resp.count() == null) ? 0 : resp.count();
+        int totalCount = (resp.count() == null) ? 0 : resp.count();
 
         // 3) 짧은 트랜잭션: DB 반영
         tx.executeWithoutResult(status -> {
@@ -65,8 +71,15 @@ public class BaselineFillService {
 
             var mapped = items.stream()
                     .filter(it -> it.problemId() != null)
+                    .filter(it -> it.level() != null)
                     .map(it -> new SolvedProblemItem(it.problemId(), it.level()))
                     .toList();
+
+            if (mapped.isEmpty()) {
+                log.warn("All items filtered out. will retry. userId={}, handle={}, nextPage={}, rawItems={}",
+                        t.userId(), t.bojHandle(), t.nextPage(), items.size());
+                return; 
+            }
 
             solvedRepo.upsertBatch(t.userId(), mapped);
             stateRepo.advancePage(t.userId());
