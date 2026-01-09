@@ -12,7 +12,7 @@ import java.time.Clock;
 import java.time.Duration;
 
 @Configuration
-public class solvedacConfig {
+public class SolvedacConfig {
     @Bean
     TransactionTemplate transactionTemplate(PlatformTransactionManager tm) {
         return new TransactionTemplate(tm);
