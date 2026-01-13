@@ -41,8 +41,10 @@ public class SolvedAcClient {
         try {
             return searchSolvedProblems(handle, page); // 기존 메서드(실제 호출) 재사용
         } catch (ApiCooldownActiveException e) {
+            log.warn("API cooldown is active during the call: {}", e.getMessage());
             return null;
         } catch (RuntimeException e) {
+            log.error("searchSolvedProblems API call failed for handle={}, page={}", handle, page, e);
             return null;
         }
     }
@@ -51,8 +53,10 @@ public class SolvedAcClient {
         try {
             return userShow(handle);
         } catch (ApiCooldownActiveException e) {
+            log.warn("API cooldown is active during the call: {}", e.getMessage());
             return null;
         } catch (RuntimeException e) {
+            log.error("userShow API call failed for handle={}", handle, e);
             return null;
         }
     }
