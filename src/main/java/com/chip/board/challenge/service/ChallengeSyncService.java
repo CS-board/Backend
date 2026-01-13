@@ -101,18 +101,16 @@ public class ChallengeSyncService {
 
         // 3) scoring (DB만) - scoring 구간에만
         if (scoringPhase) {
-            // 점수 후보(credited_at IS NULL)가 있는 유저를 1명씩 처리하는 로직을 권장
-            // (아래는 “한 tick에 user_id 1명만” 처리한다는 전제로, pick 메서드를 추가해도 되고,
-            //  없으면 서비스에서 직접 EXISTS 기반으로 cursor scan을 넣어도 됩니다.)
-            var userIdOpt = tx.execute(st -> pickOneScoreTargetUserId());
-            if (userIdOpt != null && userIdOpt.isPresent()) {
+            tx.executeWithoutResult(st -> {
+                var userIdOpt = pickOneScoreTargetUserId(); 
+                if (userIdOpt.isEmpty()) return;
+
                 long userId = userIdOpt.get();
-                tx.executeWithoutResult(st -> {
-                    scoreRepo.insertScoreEventsForUncredited(c.getChallengeId(), userId);
-                    scoreRepo.fillCreditedAtFromScoreEvent(userId);
-                });
-                return;
-            }
+
+                scoreRepo.insertScoreEventsForUncredited(c.getChallengeId(), userId);
+                scoreRepo.fillCreditedAtFromScoreEvent(userId);
+            });
+            return;
         }
 
         // 4) finalize (DB만)
