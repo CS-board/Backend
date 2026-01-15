@@ -2,8 +2,8 @@ package com.chip.board.challenge;
 
 import com.chip.board.challenge.domain.Challenge;
 import com.chip.board.challenge.domain.ChallengeStatus;
-import com.chip.board.challenge.repository.ChallengeRepository;
-import com.chip.board.challenge.batch.ChallengeStatusScheduler;
+import com.chip.board.challenge.infrastructure.persistence.ChallengeRepository;
+import com.chip.board.challenge.application.scheduler.ChallengeStatusScheduler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

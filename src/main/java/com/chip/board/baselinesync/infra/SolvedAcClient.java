@@ -1,7 +1,7 @@
 package com.chip.board.baselinesync.infra;
 
-import com.chip.board.baselinesync.model.SolvedAcSearchProblemResponse;
-import com.chip.board.baselinesync.model.SolvedAcUserShowResponse;
+import com.chip.board.baselinesync.infra.response.SolvedAcSearchProblemResponse;
+import com.chip.board.baselinesync.infra.response.SolvedAcUserShowResponse;
 import com.chip.board.cooldown.infra.ApiCooldownActiveException;
 import com.chip.board.cooldown.infra.ExternalApiCooldownJdbcRepository;
 import lombok.extern.slf4j.Slf4j;
