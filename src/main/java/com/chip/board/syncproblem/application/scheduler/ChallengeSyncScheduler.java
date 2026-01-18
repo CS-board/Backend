@@ -23,11 +23,11 @@ public class ChallengeSyncScheduler {
         LocalTime now = LocalTime.now(clock);
 
         // 00:01 <= now < 03:00
-        if (now.isBefore(LocalTime.of(0, 2)) || !now.isBefore(LocalTime.of(3, 0))) {
+        if (now.isBefore(LocalTime.of(0, 1)) || !now.isBefore(LocalTime.of(3, 0))) {
             return;
         }
 
-        LocalDateTime windowStart = LocalDate.now(clock).atTime(0, 2, 0);
+        LocalDateTime windowStart = LocalDate.now(clock).atTime(0, 1, 0);
         challengeSyncService.tickOnce(windowStart); // tick 1회당 API 최대 1번
     }
 }
