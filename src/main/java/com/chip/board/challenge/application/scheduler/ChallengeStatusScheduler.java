@@ -21,13 +21,9 @@ public class ChallengeStatusScheduler {
     private final ChallengeLoadPort challengeLoadPort;
     private final ChallengeSyncIndexPort challengeSyncIndexPort;
 
-    @Scheduled(cron = "0 51 15 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 52 16 * * *", zone = "Asia/Seoul")
     public void updateChallengeStatus() {
-
         challengeStatusService.updateChallengeStatus();
-
-        boolean shouldRun = shouldRun();
-        if (!shouldRun) return;
 
         Optional<ChallengeSyncSnapshot> challengeSyncSnapshot = challengeLoadPort.findCurrentSyncTarget();
 
@@ -37,7 +33,7 @@ public class ChallengeStatusScheduler {
         }
 
         ChallengeSyncSnapshot snap = challengeSyncSnapshot.get();
-        // CLOSED & closeFinalized=true면 더 이상 처리 대상이 아니므로 삭제
+        // 방어적 코드
         if (snap.status() == ChallengeStatus.CLOSED && snap.closeFinalized()) {
             challengeSyncIndexPort.delete();
             return;
@@ -47,8 +43,5 @@ public class ChallengeStatusScheduler {
 
     }
 
-    private boolean shouldRun() {
-        return challengeLoadPort.existsActive()
-                || challengeLoadPort.existsClosedUnfinalized();
-    }
+
 }

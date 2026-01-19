@@ -60,6 +60,8 @@ public class ChallengeSyncService {
 
         long now = System.currentTimeMillis();
 
+        boolean apiQueuesDrained = false;
+
         if (!cooldownActive) {
             // 1) observe (API 1회)
             Optional<Long> observeUserIdOpt = observeQueuePort.popDueUserId(now);
@@ -85,7 +87,7 @@ public class ChallengeSyncService {
                 if (deltaOpt != null && deltaOpt.isPresent()) {
                     deltaJobQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
                 }
-                return; // tick당 API 1회
+                return;
             }
 
             // 2) delta (API 1회)
@@ -120,8 +122,11 @@ public class ChallengeSyncService {
                 );
 
                 if (needMore) deltaJobQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
-                return; // tick당 API 1회
+                return;
             }
+
+            // observe/delta 모두 못 뽑았으면(=할 API 작업 없음)
+            apiQueuesDrained = true;
         }
 
         // 3) scoring (DB only)
@@ -136,32 +141,25 @@ public class ChallengeSyncService {
                 return true;
             });
             if (Boolean.TRUE.equals(didScore)) return;
+            // 여기까지 왔으면 scoring 대상도 없음
         }
 
-        // 4) finalize (DB only) + finalize 결과를 Redis 인덱스에 반영
-        ChallengeSyncSnapshot after = tx.execute(st -> {
-            Challenge managed = challengeSavePort.getByIdForUpdate(snap.challengeId());
+        // ✅ 의도대로: observe/delta가 비었고(=drained), scoring 대상도 없을 때만 종료 처리 + delete
+        if (apiQueuesDrained) {
+            tx.executeWithoutResult(st -> {
+                Challenge managed = challengeSavePort.getByIdForUpdate(snap.challengeId());
+                if (managed.getStatus() == ChallengeStatus.ACTIVE && !managed.isPrepareFinalized()) {
+                    managed.finalizePrepare();
+                }
+                if (managed.getStatus() == ChallengeStatus.CLOSED && !managed.isCloseFinalized()) {
+                    managed.finalizeClose();
+                }
+            });
 
-            if (managed.getStatus() == ChallengeStatus.ACTIVE && !managed.isPrepareFinalized()) {
-                boolean observePendingExists = syncStateQueryPort.existsObservePending(windowStart);
-                boolean deltaPendingExists = syncStateQueryPort.existsDeltaPending(windowStart);
-                if (!observePendingExists && !deltaPendingExists) managed.finalizePrepare();
-                return ChallengeSyncSnapshot.from(managed);
-            }
-
-            if (managed.getStatus() == ChallengeStatus.CLOSED && !managed.isCloseFinalized()) {
-                boolean observePendingExists = syncStateQueryPort.existsObservePending(windowStart);
-                boolean deltaPendingExists = syncStateQueryPort.existsDeltaPending(windowStart);
-                boolean scoreableExists = syncStateQueryPort.existsAnyScoreable();
-                if (!observePendingExists && !deltaPendingExists && !scoreableExists) managed.finalizeClose();
-                return ChallengeSyncSnapshot.from(managed);
-            }
-
-            return ChallengeSyncSnapshot.from(managed);
-        });
-
-        if (after != null) syncIndexPort.delete();
+            syncIndexPort.delete();
+        }
     }
+
 
     private static CreditedAtMode decideUpsertMode(ChallengeSyncSnapshot s) {
         if (isScoringPhase(s)) return CreditedAtMode.SCOREABLE_NULL;

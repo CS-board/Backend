@@ -26,17 +26,24 @@ public class ChallengeSyncIndexRedisAdapter implements ChallengeSyncIndexPort {
     @Override
     public Optional<ChallengeSyncSnapshot> load() {
         try {
-            Object cidObj = redis.opsForHash().get(KEY, F_CHALLENGE_ID);
-            Object statusObj = redis.opsForHash().get(KEY, F_STATUS);
-            Object pfObj = redis.opsForHash().get(KEY, F_PREPARE_FINALIZED);
-            Object cfObj = redis.opsForHash().get(KEY, F_CLOSE_FINALIZED);
+            Map<Object, Object> entries = redis.opsForHash().entries(KEY);
+            if (entries.isEmpty()) {
+                return Optional.empty();
+            }
 
-            if (cidObj == null || statusObj == null || pfObj == null || cfObj == null) return Optional.empty();
+            String cidStr = (String) entries.get(F_CHALLENGE_ID);
+            String statusStr = (String) entries.get(F_STATUS);
+            String pfStr = (String) entries.get(F_PREPARE_FINALIZED);
+            String cfStr = (String) entries.get(F_CLOSE_FINALIZED);
 
-            long challengeId = Long.parseLong(cidObj.toString());
-            ChallengeStatus status = ChallengeStatus.valueOf(statusObj.toString());
-            boolean prepareFinalized = "1".equals(pfObj.toString());
-            boolean closeFinalized = "1".equals(cfObj.toString());
+            if (cidStr == null || statusStr == null || pfStr == null || cfStr == null) {
+                return Optional.empty();
+            }
+
+            long challengeId = Long.parseLong(cidStr);
+            ChallengeStatus status = ChallengeStatus.valueOf(statusStr);
+            boolean prepareFinalized = "1".equals(pfStr);
+            boolean closeFinalized = "1".equals(cfStr);
 
             return Optional.of(new ChallengeSyncSnapshot(challengeId, status, prepareFinalized, closeFinalized));
         } catch (Exception e) {

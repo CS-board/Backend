@@ -75,11 +75,6 @@ public class ChallengePersistenceAdapter implements ChallengeLoadPort, Challenge
     public Optional<ChallengeSyncSnapshot> findCurrentSyncTarget() {
         return challengeRepository.findFirstByStatus(ChallengeStatus.ACTIVE)
                 .or(() -> challengeRepository.findTopByStatusAndCloseFinalizedFalseOrderByEndAtDesc(ChallengeStatus.CLOSED))
-                .map(c -> new ChallengeSyncSnapshot(
-                        c.getChallengeId(),
-                        c.getStatus(),
-                        c.isPrepareFinalized(),
-                        c.isCloseFinalized()
-                ));
+                .map(ChallengeSyncSnapshot::from);
     }
 }
