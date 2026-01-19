@@ -1,10 +1,16 @@
 package com.chip.board.challenge.application.scheduler;
 
+import com.chip.board.challenge.application.port.ChallengeLoadPort;
 import com.chip.board.challenge.application.service.ChallengeStatusService;
+import com.chip.board.challenge.domain.ChallengeStatus;
+import com.chip.board.challenge.application.port.ChallengeSyncIndexPort;
+import com.chip.board.syncproblem.application.port.dto.ChallengeSyncSnapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -12,9 +18,30 @@ import org.springframework.stereotype.Component;
 public class ChallengeStatusScheduler {
 
     private final ChallengeStatusService challengeStatusService;
+    private final ChallengeLoadPort challengeLoadPort;
+    private final ChallengeSyncIndexPort challengeSyncIndexPort;
 
-    @Scheduled(cron = "0 42 13 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 52 16 * * *", zone = "Asia/Seoul")
     public void updateChallengeStatus() {
         challengeStatusService.updateChallengeStatus();
+
+        Optional<ChallengeSyncSnapshot> challengeSyncSnapshot = challengeLoadPort.findCurrentSyncTarget();
+
+        if (challengeSyncSnapshot.isEmpty()) {
+            challengeSyncIndexPort.delete();
+            return;
+        }
+
+        ChallengeSyncSnapshot snap = challengeSyncSnapshot.get();
+        // 방어적 코드
+        if (snap.status() == ChallengeStatus.CLOSED && snap.closeFinalized()) {
+            challengeSyncIndexPort.delete();
+            return;
+        }
+
+        challengeSyncIndexPort.save(snap);
+
     }
+
+
 }

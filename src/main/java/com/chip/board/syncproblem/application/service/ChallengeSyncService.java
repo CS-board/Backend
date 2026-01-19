@@ -8,13 +8,14 @@ import com.chip.board.baselinesync.domain.CreditedAtMode;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.DeltaPageTarget;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SolvedProblemItem;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SyncTarget;
-import com.chip.board.challenge.application.port.ChallengeLoadPort;
 import com.chip.board.challenge.application.port.ChallengeSavePort;
 import com.chip.board.challenge.domain.Challenge;
 import com.chip.board.challenge.domain.ChallengeStatus;
 import com.chip.board.syncproblem.application.port.ChallengeDeltaJobQueuePort;
 import com.chip.board.syncproblem.application.port.ChallengeObserveJobQueuePort;
+import com.chip.board.challenge.application.port.ChallengeSyncIndexPort;
 import com.chip.board.syncproblem.application.port.ScoreEventPort;
+import com.chip.board.syncproblem.application.port.dto.ChallengeSyncSnapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,9 +30,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChallengeSyncService {
 
-    private final ChallengeLoadPort challengeLoadPort;
-    private final ChallengeSavePort challengeSavePort;
-
     private final SyncStateQueryPort syncStateQueryPort;
     private final SyncStateCommandPort syncStateCommandPort;
 
@@ -41,26 +39,32 @@ public class ChallengeSyncService {
 
     private final TransactionTemplate tx;
 
-    private final ChallengeObserveJobQueuePort observeQueue;
-    private final ChallengeDeltaJobQueuePort deltaQueue;
+    private final ChallengeObserveJobQueuePort observeQueuePort;
+    private final ChallengeDeltaJobQueuePort deltaJobQueuePort;
+
+    private final ChallengeSyncIndexPort syncIndexPort;
+
+    private final ChallengeSavePort challengeSavePort;
 
     public void tickOnce(LocalDateTime windowStart) {
         boolean cooldownActive = solvedAcPort.isCooldownActive();
 
-        Optional<Challenge> challengeOpt = pickChallenge();
-        if (challengeOpt.isEmpty()) return;
+        Optional<ChallengeSyncSnapshot> snapOpt = syncIndexPort.load();
+        if (snapOpt.isEmpty()) return;
 
-        Challenge challenge = challengeOpt.get();
-        if (challenge.getStatus() == ChallengeStatus.CLOSED && challenge.isCloseFinalized()) return;
+        ChallengeSyncSnapshot snap = snapOpt.get();
+        if (snap.status() == ChallengeStatus.CLOSED && snap.closeFinalized()) return;
 
-        CreditedAtMode upsertMode = decideUpsertMode(challenge);
-        boolean scoringPhase = isScoringPhase(challenge);
+        CreditedAtMode upsertMode = decideUpsertMode(snap);
+        boolean scoringPhase = isScoringPhase(snap);
 
         long now = System.currentTimeMillis();
 
+        boolean apiQueuesDrained = false;
+
         if (!cooldownActive) {
             // 1) observe (API 1회)
-            Optional<Long> observeUserIdOpt = observeQueue.popDueUserId(now);
+            Optional<Long> observeUserIdOpt = observeQueuePort.popDueUserId(now);
             if (observeUserIdOpt.isPresent()) {
                 long userId = observeUserIdOpt.get();
 
@@ -72,7 +76,7 @@ public class ChallengeSyncService {
 
                 Integer solvedCount = solvedAcPort.fetchSolvedCountOrNull(t.bojHandle());
                 if (solvedCount == null) {
-                    observeQueue.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
+                    observeQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
                     return;
                 }
 
@@ -81,13 +85,13 @@ public class ChallengeSyncService {
                 Optional<DeltaPageTarget> deltaOpt =
                         tx.execute(st -> syncStateQueryPort.findDeltaTarget(userId, windowStart));
                 if (deltaOpt != null && deltaOpt.isPresent()) {
-                    deltaQueue.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
+                    deltaJobQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
                 }
-                return; // tick당 API 1회
+                return;
             }
 
             // 2) delta (API 1회)
-            Optional<Long> deltaUserIdOpt = deltaQueue.popDueUserId(now);
+            Optional<Long> deltaUserIdOpt = deltaJobQueuePort.popDueUserId(now);
             if (deltaUserIdOpt.isPresent()) {
                 long userId = deltaUserIdOpt.get();
 
@@ -100,7 +104,7 @@ public class ChallengeSyncService {
                 List<SolvedProblemItem> items =
                         solvedAcPort.fetchSolvedProblemPageOrNull(delta.bojHandle(), delta.nextPage());
                 if (items == null) {
-                    deltaQueue.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
+                    deltaJobQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
                     return;
                 }
 
@@ -117,9 +121,12 @@ public class ChallengeSyncService {
                         })
                 );
 
-                if (needMore) deltaQueue.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
-                return; // tick당 API 1회
+                if (needMore) deltaJobQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
+                return;
             }
+
+            // observe/delta 모두 못 뽑았으면(=할 API 작업 없음)
+            apiQueuesDrained = true;
         }
 
         // 3) scoring (DB only)
@@ -129,48 +136,38 @@ public class ChallengeSyncService {
                 if (scoreTargetUserIdOpt.isEmpty()) return false;
 
                 long userId = scoreTargetUserIdOpt.get();
-                scoreEventPort.insertScoreEventsForUncredited(challenge.getChallengeId(), userId);
+                scoreEventPort.insertScoreEventsForUncredited(snap.challengeId(), userId);
                 scoreEventPort.fillCreditedAtFromScoreEvent(userId);
                 return true;
             });
-
             if (Boolean.TRUE.equals(didScore)) return;
+            // 여기까지 왔으면 scoring 대상도 없음
         }
 
-        // 4) finalize (DB only)
-        tx.executeWithoutResult(st -> {
-            Challenge managed = challengeSavePort.getByIdForUpdate(challenge.getChallengeId());
+        // ✅ 의도대로: observe/delta가 비었고(=drained), scoring 대상도 없을 때만 종료 처리 + delete
+        if (apiQueuesDrained) {
+            tx.executeWithoutResult(st -> {
+                Challenge managed = challengeSavePort.getByIdForUpdate(snap.challengeId());
+                if (managed.getStatus() == ChallengeStatus.ACTIVE && !managed.isPrepareFinalized()) {
+                    managed.finalizePrepare();
+                }
+                if (managed.getStatus() == ChallengeStatus.CLOSED && !managed.isCloseFinalized()) {
+                    managed.finalizeClose();
+                }
+            });
 
-            if (managed.getStatus() == ChallengeStatus.ACTIVE && !managed.isPrepareFinalized()) {
-                boolean observePendingExists = syncStateQueryPort.existsObservePending(windowStart);
-                boolean deltaPendingExists = syncStateQueryPort.existsDeltaPending(windowStart);
-                if (!observePendingExists && !deltaPendingExists) managed.finalizePrepare();
-                return;
-            }
-
-            if (managed.getStatus() == ChallengeStatus.CLOSED && !managed.isCloseFinalized()) {
-                boolean observePendingExists = syncStateQueryPort.existsObservePending(windowStart);
-                boolean deltaPendingExists = syncStateQueryPort.existsDeltaPending(windowStart);
-                boolean scoreableExists = syncStateQueryPort.existsAnyScoreable();
-                if (!observePendingExists && !deltaPendingExists && !scoreableExists) managed.finalizeClose();
-            }
-        });
+            syncIndexPort.delete();
+        }
     }
 
-    private Optional<Challenge> pickChallenge() {
-        Optional<Challenge> active = challengeLoadPort.findActive();
-        if (active.isPresent()) return active;
 
-        return challengeLoadPort.findLatestUnfinalizedClosed();
-    }
-
-    private static CreditedAtMode decideUpsertMode(Challenge c) {
-        if (isScoringPhase(c)) return CreditedAtMode.SCOREABLE_NULL;
+    private static CreditedAtMode decideUpsertMode(ChallengeSyncSnapshot s) {
+        if (isScoringPhase(s)) return CreditedAtMode.SCOREABLE_NULL;
         return CreditedAtMode.SEAL_NOW;
     }
 
-    private static boolean isScoringPhase(Challenge c) {
-        return (c.getStatus() == ChallengeStatus.ACTIVE && c.isPrepareFinalized())
-                || (c.getStatus() == ChallengeStatus.CLOSED && !c.isCloseFinalized());
+    private static boolean isScoringPhase(ChallengeSyncSnapshot s) {
+        return (s.status() == ChallengeStatus.ACTIVE && s.prepareFinalized())
+                || (s.status() == ChallengeStatus.CLOSED && !s.closeFinalized());
     }
 }
