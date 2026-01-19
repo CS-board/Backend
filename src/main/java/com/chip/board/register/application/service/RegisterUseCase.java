@@ -1,6 +1,6 @@
 package com.chip.board.register.application.service;
 
-import com.chip.board.baselinesync.application.port.BaselineEnqueuePort;
+import com.chip.board.baselinesync.application.port.baselineJob.BaselineEnqueuePort;
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
 import com.chip.board.register.application.command.RegisterUserCommand;
@@ -52,12 +52,6 @@ public class RegisterUseCase {
             @Override
             public void afterCommit() {
                 baselineEnqueuePort.enqueueBaseline(user.getId());
-            }
-        });
-
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override public void afterCommit() {
-                verificationCodeStore.delete(cmd.username());
             }
         });
     }

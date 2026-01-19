@@ -1,48 +1,56 @@
 package com.chip.board.challenge.application.service;
 
+import com.chip.board.challenge.application.port.ChallengeLoadPort;
+import com.chip.board.challenge.application.port.ChallengeSavePort;
 import com.chip.board.challenge.domain.Challenge;
 import com.chip.board.challenge.domain.ChallengeStatus;
-import com.chip.board.challenge.infrastructure.persistence.ChallengeRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChallengeStatusService {
 
-    private final ChallengeRepository challengeRepository;
+    private final ChallengeLoadPort challengeLoadPort;
+    private final ChallengeSavePort challengeSavePort;
     private final Clock clock;
 
     @Transactional
     public void updateChallengeStatus() {
         LocalDateTime now = LocalDateTime.now(clock);
 
-        challengeRepository
-                .findFirstByStatusIn(List.of(ChallengeStatus.SCHEDULED, ChallengeStatus.ACTIVE))
-                .ifPresent(challenge -> updateOne(challenge, now));
+        // ACTIVE/SCHEDULED 중 하나를 가져오되, 우선순위/정렬은 Port 구현에서 책임
+        challengeLoadPort.findFirstOpen()
+                .ifPresent(challenge -> {
+                    boolean changed = updateOne(challenge, now);
+                    if (changed) {
+                        // JPA면 dirty checking으로도 되지만, Port 추상화 관점에선 명시 save가 안전
+                        challengeSavePort.save(challenge);
+                    }
+                });
     }
 
-    private void updateOne(Challenge challenge, LocalDateTime now) {
+    private boolean updateOne(Challenge challenge, LocalDateTime now) {
         if (shouldClose(challenge, now)) {
             challenge.close();
-            return;
+            return true;
         }
 
         if (shouldActivate(challenge, now)) {
             challenge.activate(now);
+            return true;
         }
+
+        return false;
     }
 
     private boolean shouldClose(Challenge challenge, LocalDateTime now) {
-        // 상태가 SCHEDULED/ACTIVE인 것만 조회하므로 CLOSED 체크는 사실상 불필요하지만 방어적으로 둠
-        return !now.isBefore(challenge.getEndAt()) && challenge.getStatus() != ChallengeStatus.CLOSED;
+        return !now.isBefore(challenge.getEndAt())
+                && challenge.getStatus() != ChallengeStatus.CLOSED;
     }
 
     private boolean shouldActivate(Challenge challenge, LocalDateTime now) {

@@ -12,4 +12,7 @@ public interface ChallengeLoadPort {
     Optional<Challenge> findById(long id);
     boolean existsAnyOpen(); // ACTIVE or SCHEDULED
     boolean existsOverlappingRange(LocalDateTime startAt, LocalDateTime endAt);
+
+    boolean existsActive();
+    boolean existsClosedUnfinalized();
 }

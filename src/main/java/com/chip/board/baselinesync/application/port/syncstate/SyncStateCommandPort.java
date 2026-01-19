@@ -4,5 +4,7 @@ public interface SyncStateCommandPort {
     void updateObserved(long userId, int observedSolvedCount);
     void advancePage(long userId);
     void finishDelta(long userId, int observedSolvedCount);
+    void markBaselineReady(long userId);
+    void initLastSolvedCountOnce(long userId, int totalCount);
 }
 

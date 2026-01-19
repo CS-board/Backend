@@ -1,21 +1,20 @@
 package com.chip.board.syncproblem.application.service;
 
+import com.chip.board.baselinesync.application.port.api.SolvedAcPort;
+import com.chip.board.baselinesync.application.port.solvedproblem.UserSolvedProblemPort;
+import com.chip.board.baselinesync.application.port.syncstate.SyncStateCommandPort;
+import com.chip.board.baselinesync.application.port.syncstate.SyncStateQueryPort;
 import com.chip.board.baselinesync.domain.CreditedAtMode;
-import com.chip.board.baselinesync.infrastructure.api.SolvedAcClient;
-import com.chip.board.baselinesync.infrastructure.persistence.*;
-import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedAcSearchProblemResponse;
-import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedAcUserShowResponse;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.DeltaPageTarget;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SolvedProblemItem;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SyncTarget;
+import com.chip.board.challenge.application.port.ChallengeLoadPort;
+import com.chip.board.challenge.application.port.ChallengeSavePort;
 import com.chip.board.challenge.domain.Challenge;
 import com.chip.board.challenge.domain.ChallengeStatus;
-import com.chip.board.challenge.infrastructure.persistence.ChallengeRepository;
-import com.chip.board.syncproblem.infrastructure.persistence.ScoreEventJdbcRepository;
-import com.chip.board.syncproblem.application.component.reader.ChallengeDeltaJobReader;
-import com.chip.board.syncproblem.application.component.reader.ChallengeObserveJobReader;
-import com.chip.board.syncproblem.application.component.writer.ChallengeDeltaJobWriter;
-import com.chip.board.syncproblem.application.component.writer.ChallengeObserveJobWriter;
+import com.chip.board.syncproblem.application.port.ChallengeDeltaJobQueuePort;
+import com.chip.board.syncproblem.application.port.ChallengeObserveJobQueuePort;
+import com.chip.board.syncproblem.application.port.ScoreEventPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,21 +29,23 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChallengeSyncService {
 
-    private final ChallengeRepository challengeRepo;
-    private final UserSolvedSyncStateJdbcRepository stateRepo;
-    private final UserSolvedProblemJdbcRepository solvedRepo;
-    private final ScoreEventJdbcRepository scoreRepo;
+    private final ChallengeLoadPort challengeLoadPort;
+    private final ChallengeSavePort challengeSavePort;
 
-    private final SolvedAcClient solvedAc;
+    private final SyncStateQueryPort syncStateQueryPort;
+    private final SyncStateCommandPort syncStateCommandPort;
+
+    private final UserSolvedProblemPort userSolvedProblemPort;
+    private final ScoreEventPort scoreEventPort;
+    private final SolvedAcPort solvedAcPort;
+
     private final TransactionTemplate tx;
 
-    private final ChallengeObserveJobReader observeReader;
-    private final ChallengeObserveJobWriter observeWriter;
-    private final ChallengeDeltaJobReader deltaReader;
-    private final ChallengeDeltaJobWriter deltaWriter;
+    private final ChallengeObserveJobQueuePort observeQueue;
+    private final ChallengeDeltaJobQueuePort deltaQueue;
 
     public void tickOnce(LocalDateTime windowStart) {
-        boolean cooldownActive = solvedAc.isCooldownActive();
+        boolean cooldownActive = solvedAcPort.isCooldownActive();
 
         Optional<Challenge> challengeOpt = pickChallenge();
         if (challengeOpt.isEmpty()) return;
@@ -53,134 +54,114 @@ public class ChallengeSyncService {
         if (challenge.getStatus() == ChallengeStatus.CLOSED && challenge.isCloseFinalized()) return;
 
         CreditedAtMode upsertMode = decideUpsertMode(challenge);
-        boolean isScoringPhase = isScoringPhase(challenge);
+        boolean scoringPhase = isScoringPhase(challenge);
 
         long now = System.currentTimeMillis();
 
         if (!cooldownActive) {
             // 1) observe (API 1회)
-            Optional<Long> observeUserIdOpt = observeReader.popDueUserId(now);
+            Optional<Long> observeUserIdOpt = observeQueue.popDueUserId(now);
             if (observeUserIdOpt.isPresent()) {
                 long userId = observeUserIdOpt.get();
 
-                Optional<SyncTarget> tOpt = tx.execute(status -> stateRepo.findObserveTarget(userId, windowStart));
+                Optional<SyncTarget> tOpt =
+                        tx.execute(st -> syncStateQueryPort.findObserveTarget(userId, windowStart));
                 if (tOpt == null || tOpt.isEmpty()) return;
 
                 SyncTarget t = tOpt.get();
 
-                SolvedAcUserShowResponse userShow = solvedAc.userShowSafe(t.bojHandle());
-                if (userShow == null || userShow.solvedCount() == null) {
-                    observeWriter.scheduleAt(userId, solvedAc.nextAllowedAtMs());
+                Integer solvedCount = solvedAcPort.fetchSolvedCountOrNull(t.bojHandle());
+                if (solvedCount == null) {
+                    observeQueue.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
                     return;
                 }
 
-                Integer solvedCount = userShow.solvedCount();
+                tx.executeWithoutResult(st -> syncStateCommandPort.updateObserved(userId, solvedCount));
 
-                // observed 반영 → delta pending 판단(기존 DB 로직 유지)
-                tx.executeWithoutResult(status -> stateRepo.updateObserved(userId, solvedCount));
-
-                // delta가 필요한 상태면 delta 큐에 올림(필요 메서드: findDeltaTarget)
                 Optional<DeltaPageTarget> deltaOpt =
-                        tx.execute(status -> stateRepo.findDeltaTarget(userId, windowStart));
+                        tx.execute(st -> syncStateQueryPort.findDeltaTarget(userId, windowStart));
                 if (deltaOpt != null && deltaOpt.isPresent()) {
-                    deltaWriter.scheduleAt(userId, solvedAc.nextAllowedAtMs());
+                    deltaQueue.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
                 }
                 return; // tick당 API 1회
             }
 
-            // 2) delta page sync (API 1회)
-            Optional<Long> deltaUserIdOpt = deltaReader.popDueUserId(now);
+            // 2) delta (API 1회)
+            Optional<Long> deltaUserIdOpt = deltaQueue.popDueUserId(now);
             if (deltaUserIdOpt.isPresent()) {
                 long userId = deltaUserIdOpt.get();
 
                 Optional<DeltaPageTarget> deltaOpt =
-                        tx.execute(status -> stateRepo.findDeltaTarget(userId, windowStart));
+                        tx.execute(st -> syncStateQueryPort.findDeltaTarget(userId, windowStart));
                 if (deltaOpt == null || deltaOpt.isEmpty()) return;
 
                 DeltaPageTarget delta = deltaOpt.get();
 
-                SolvedAcSearchProblemResponse resp =
-                        solvedAc.searchSolvedProblemsSafe(delta.bojHandle(), delta.nextPage());
-                if (resp == null) {
-                    deltaWriter.scheduleAt(userId, solvedAc.nextAllowedAtMs());
+                List<SolvedProblemItem> items =
+                        solvedAcPort.fetchSolvedProblemPageOrNull(delta.bojHandle(), delta.nextPage());
+                if (items == null) {
+                    deltaQueue.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
                     return;
                 }
 
-                List<SolvedAcSearchProblemResponse.Item> items =
-                        (resp.items() == null) ? List.of() : resp.items();
-
                 boolean needMore = Boolean.TRUE.equals(
-                        tx.execute(status -> {
+                        tx.execute(st -> {
                             if (items.isEmpty()) {
-                                stateRepo.finishDelta(delta.userId(), delta.observedSolvedCount());
+                                syncStateCommandPort.finishDelta(delta.userId(), delta.observedSolvedCount());
                                 return false;
                             }
 
-                            List<SolvedProblemItem> solvedItems = items.stream()
-                                    .filter(it -> it.problemId() != null)
-                                    .filter(it -> it.level() != null)
-                                    .map(it -> new SolvedProblemItem(it.problemId(), it.level()))
-                                    .toList();
-
-                            if (!solvedItems.isEmpty()) {
-                                solvedRepo.upsertBatch(delta.userId(), solvedItems, upsertMode);
-                            }
-
-                            stateRepo.advancePage(delta.userId());
+                            userSolvedProblemPort.upsertBatch(delta.userId(), items, upsertMode);
+                            syncStateCommandPort.advancePage(delta.userId());
                             return true;
                         })
                 );
 
-
-                if (needMore) {
-                    deltaWriter.scheduleAt(userId, solvedAc.nextAllowedAtMs());
-                }
+                if (needMore) deltaQueue.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
                 return; // tick당 API 1회
             }
         }
-        // 3) scoring (DB만) - 기존 유지
-        if (isScoringPhase) {
-            Boolean didScore = tx.execute(status -> {
-                Optional<Long> scoreTargetUserIdOpt = stateRepo.pickOneForScoring();
+
+        // 3) scoring (DB only)
+        if (scoringPhase) {
+            Boolean didScore = tx.execute(st -> {
+                Optional<Long> scoreTargetUserIdOpt = syncStateQueryPort.pickOneForScoring();
                 if (scoreTargetUserIdOpt.isEmpty()) return false;
 
                 long userId = scoreTargetUserIdOpt.get();
-                scoreRepo.insertScoreEventsForUncredited(challenge.getChallengeId(), userId);
-                scoreRepo.fillCreditedAtFromScoreEvent(userId);
+                scoreEventPort.insertScoreEventsForUncredited(challenge.getChallengeId(), userId);
+                scoreEventPort.fillCreditedAtFromScoreEvent(userId);
                 return true;
             });
 
-            // 실제로 1건 처리했을 때만 tick 종료
             if (Boolean.TRUE.equals(didScore)) return;
-            // 처리할 게 없으면 finalize로 계속 진행
         }
 
-        // 4) finalize (DB만) - 기존 유지
-        tx.executeWithoutResult(status -> {
-            Challenge managed = challengeRepo.findById(challenge.getChallengeId()).orElseThrow();
+        // 4) finalize (DB only)
+        tx.executeWithoutResult(st -> {
+            Challenge managed = challengeSavePort.getByIdForUpdate(challenge.getChallengeId());
 
             if (managed.getStatus() == ChallengeStatus.ACTIVE && !managed.isPrepareFinalized()) {
-                boolean observePendingExists = stateRepo.existsObservePending(windowStart);
-                boolean deltaPendingExists = stateRepo.existsDeltaPending(windowStart);
+                boolean observePendingExists = syncStateQueryPort.existsObservePending(windowStart);
+                boolean deltaPendingExists = syncStateQueryPort.existsDeltaPending(windowStart);
                 if (!observePendingExists && !deltaPendingExists) managed.finalizePrepare();
                 return;
             }
 
             if (managed.getStatus() == ChallengeStatus.CLOSED && !managed.isCloseFinalized()) {
-                boolean observePendingExists = stateRepo.existsObservePending(windowStart);
-                boolean deltaPendingExists = stateRepo.existsDeltaPending(windowStart);
-                boolean scoreableExists = stateRepo.existsAnyScoreable();
+                boolean observePendingExists = syncStateQueryPort.existsObservePending(windowStart);
+                boolean deltaPendingExists = syncStateQueryPort.existsDeltaPending(windowStart);
+                boolean scoreableExists = syncStateQueryPort.existsAnyScoreable();
                 if (!observePendingExists && !deltaPendingExists && !scoreableExists) managed.finalizeClose();
             }
         });
     }
 
     private Optional<Challenge> pickChallenge() {
-        Optional<Challenge> active =
-                challengeRepo.findFirstByStatus(ChallengeStatus.ACTIVE);
+        Optional<Challenge> active = challengeLoadPort.findActive();
         if (active.isPresent()) return active;
 
-        return challengeRepo.findTopByStatusAndCloseFinalizedFalseOrderByEndAtDesc(ChallengeStatus.CLOSED);
+        return challengeLoadPort.findLatestUnfinalizedClosed();
     }
 
     private static CreditedAtMode decideUpsertMode(Challenge c) {

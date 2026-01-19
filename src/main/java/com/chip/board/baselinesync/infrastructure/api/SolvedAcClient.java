@@ -1,7 +1,10 @@
 package com.chip.board.baselinesync.infrastructure.api;
 
+import com.chip.board.baselinesync.application.port.api.SolvedAcPort;
 import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedAcSearchProblemResponse;
 import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedAcUserShowResponse;
+import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedProblemPage;
+import com.chip.board.baselinesync.infrastructure.persistence.dto.SolvedProblemItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -14,10 +17,11 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 import java.time.Duration;
+import java.util.List;
 
 @Slf4j
 @Component
-public class SolvedAcClient {
+public class SolvedAcClient implements SolvedAcPort {
 
     private static final String GATE_KEY = "solvedac:gate:next_allowed_at_ms";
 
@@ -41,11 +45,13 @@ public class SolvedAcClient {
     }
 
     /** 전역 gate 활성 여부 */
+    @Override
     public boolean isCooldownActive() {
         return System.currentTimeMillis() < nextAllowedAtMs();
     }
 
     /** 다음 호출 가능 시각(epoch ms) */
+    @Override
     public long nextAllowedAtMs() {
         String v = redis.opsForValue().get(GATE_KEY);
         if (v == null) return 0L;
@@ -148,5 +154,46 @@ public class SolvedAcClient {
             log.warn("userShow runtime. handle={}", handle, e);
             return null;
         }
+    }
+
+    @Override
+    public Integer fetchSolvedCountOrNull(String handle) {
+        SolvedAcUserShowResponse r = userShowSafe(handle);
+        return (r == null) ? null : r.solvedCount();
+    }
+
+    @Override
+    public List<SolvedProblemItem> fetchSolvedProblemPageOrNull(String handle, int page) {
+        SolvedAcSearchProblemResponse r = searchSolvedProblemsSafe(handle, page);
+        if (r == null) return null;
+
+        List<SolvedAcSearchProblemResponse.Item> items = (r.items() == null) ? List.of() : r.items();
+        if (items.isEmpty()) return List.of();
+
+        return items.stream()
+                .filter(it -> it.problemId() != null)
+                .filter(it -> it.level() != null)
+                .map(it -> new SolvedProblemItem(it.problemId(), it.level()))
+                .toList();
+    }
+
+    @Override
+    public SolvedProblemPage fetchSolvedProblemPageWithCountOrNull(String handle, int page) {
+        // ✅ API 호출은 searchSolvedProblemsSafe 1회뿐
+        SolvedAcSearchProblemResponse r = searchSolvedProblemsSafe(handle, page);
+        if (r == null) return null;
+
+        int total = (r.count() == null) ? 0 : r.count();
+
+        List<SolvedAcSearchProblemResponse.Item> raw =
+                (r.items() == null) ? List.of() : r.items();
+
+        List<SolvedProblemItem> mapped = raw.stream()
+                .filter(it -> it.problemId() != null)
+                .filter(it -> it.level() != null)
+                .map(it -> new SolvedProblemItem(it.problemId(), it.level()))
+                .toList();
+
+        return new SolvedProblemPage(total, mapped);
     }
 }

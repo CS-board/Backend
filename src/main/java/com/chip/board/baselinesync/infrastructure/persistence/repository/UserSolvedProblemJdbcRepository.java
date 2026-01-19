@@ -1,4 +1,4 @@
-package com.chip.board.baselinesync.infrastructure.persistence;
+package com.chip.board.baselinesync.infrastructure.persistence.repository;
 
 import com.chip.board.baselinesync.domain.CreditedAtMode;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SolvedProblemItem;
