@@ -1,12 +1,13 @@
-package com.chip.board.syncproblem.infrastructure.persistence;
+package com.chip.board.syncproblem.infrastructure.persistence.repository;
 
+import com.chip.board.syncproblem.application.port.ScoreEventPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ScoreEventJdbcRepository {
+public class ScoreEventJdbcRepository implements ScoreEventPort {
 
     private final JdbcTemplate jdbcTemplate;
 

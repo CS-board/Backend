@@ -1,7 +1,7 @@
 package com.chip.board.baselinesync.application.service;
 
-import com.chip.board.baselinesync.application.component.writer.BaselineJobWriter;
-import com.chip.board.baselinesync.application.port.BaselineEnqueuePort;
+import com.chip.board.baselinesync.application.port.baselineJob.BaselineEnqueuePort;
+import com.chip.board.baselinesync.application.port.baselineJob.BaselineJobQueuePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BaselineEnqueueService implements BaselineEnqueuePort {
 
-    private final BaselineJobWriter jobWriter;
+    private final BaselineJobQueuePort jobQueuePort;
 
     @Override
     public void enqueueBaseline(long userId) {
-        jobWriter.scheduleNow(userId);
+        long now = System.currentTimeMillis();
+        jobQueuePort.scheduleAt(userId, now);
     }
 }

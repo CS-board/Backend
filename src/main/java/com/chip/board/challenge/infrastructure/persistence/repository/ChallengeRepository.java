@@ -1,4 +1,4 @@
-package com.chip.board.challenge.infrastructure.persistence;
+package com.chip.board.challenge.infrastructure.persistence.repository;
 
 import com.chip.board.challenge.domain.Challenge;
 import com.chip.board.challenge.domain.ChallengeStatus;
@@ -31,4 +31,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     boolean existsByStatus(ChallengeStatus status);
 
     boolean existsByStatusAndCloseFinalized(ChallengeStatus status, boolean closeFinalized);
+
+    Optional<Challenge> findTopByStatusOrderByStartAtAsc(ChallengeStatus status);
 }

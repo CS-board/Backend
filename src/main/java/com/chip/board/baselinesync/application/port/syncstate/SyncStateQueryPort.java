@@ -1,5 +1,6 @@
 package com.chip.board.baselinesync.application.port.syncstate;
 
+import com.chip.board.baselinesync.infrastructure.persistence.dto.BaselineTarget;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.DeltaPageTarget;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SyncTarget;
 
@@ -15,4 +16,5 @@ public interface SyncStateQueryPort {
     boolean existsDeltaPending(LocalDateTime windowStart);
     Optional<Long> pickOneForScoring(); // FOR UPDATE SKIP LOCKED 내부 구현
     boolean existsAnyScoreable();
+    Optional<BaselineTarget> findBaselineTarget(long userId);
 }

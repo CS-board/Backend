@@ -1,5 +1,7 @@
-package com.chip.board.baselinesync.infrastructure.persistence;
+package com.chip.board.baselinesync.infrastructure.persistence.repository;
 
+import com.chip.board.baselinesync.application.port.syncstate.SyncStateCommandPort;
+import com.chip.board.baselinesync.application.port.syncstate.SyncStateQueryPort;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.BaselineTarget;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.DeltaPageTarget;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SyncTarget;
@@ -14,7 +16,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class UserSolvedSyncStateJdbcRepository {
+public class UserSolvedSyncStateJdbcRepository implements SyncStateQueryPort, SyncStateCommandPort {
 
     private final JdbcTemplate jdbcTemplate;
 

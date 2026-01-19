@@ -1,8 +1,8 @@
-package com.chip.board.baselinesync.application.port;
+package com.chip.board.syncproblem.application.port;
 
 import java.util.Optional;
 
-public interface ObserveJobQueuePort {
+public interface ChallengeDeltaJobQueuePort {
     Optional<Long> popDueUserId(long nowMs);
     void scheduleAt(long userId, long dueAtMs);
 }

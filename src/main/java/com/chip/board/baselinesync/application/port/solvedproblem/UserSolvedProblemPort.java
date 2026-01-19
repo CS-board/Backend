@@ -5,6 +5,6 @@ import com.chip.board.baselinesync.infrastructure.persistence.dto.SolvedProblemI
 
 import java.util.List;
 
-public interface SolvedProblemPort {
+public interface UserSolvedProblemPort {
     void upsertBatch(long userId, List<SolvedProblemItem> items, CreditedAtMode mode);
 }
