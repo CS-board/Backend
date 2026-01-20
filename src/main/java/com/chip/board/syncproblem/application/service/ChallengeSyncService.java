@@ -11,10 +11,11 @@ import com.chip.board.baselinesync.infrastructure.persistence.dto.SyncTarget;
 import com.chip.board.challenge.application.port.ChallengeSavePort;
 import com.chip.board.challenge.domain.Challenge;
 import com.chip.board.challenge.domain.ChallengeStatus;
+import com.chip.board.score.application.port.ChallengeUserResultPort;
 import com.chip.board.syncproblem.application.port.ChallengeDeltaJobQueuePort;
 import com.chip.board.syncproblem.application.port.ChallengeObserveJobQueuePort;
 import com.chip.board.challenge.application.port.ChallengeSyncIndexPort;
-import com.chip.board.syncproblem.application.port.ScoreEventPort;
+import com.chip.board.score.application.port.ScoreEventPort;
 import com.chip.board.syncproblem.application.port.dto.ChallengeSyncSnapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ public class ChallengeSyncService {
 
     private final UserSolvedProblemPort userSolvedProblemPort;
     private final ScoreEventPort scoreEventPort;
+    private final ChallengeUserResultPort challengeUserResultPort;
     private final SolvedAcPort solvedAcPort;
 
     private final TransactionTemplate tx;
@@ -147,6 +149,9 @@ public class ChallengeSyncService {
         // ✅ 의도대로: observe/delta가 비었고(=drained), scoring 대상도 없을 때만 종료 처리 + delete
         if (apiQueuesDrained) {
             tx.executeWithoutResult(st -> {
+                challengeUserResultPort.refreshStatsForChallenge(snap.challengeId());
+                challengeUserResultPort.rolloverAndRecalculateRanks(snap.challengeId());
+
                 Challenge managed = challengeSavePort.getByIdForUpdate(snap.challengeId());
                 if (managed.getStatus() == ChallengeStatus.ACTIVE && !managed.isPrepareFinalized()) {
                     managed.finalizePrepare();

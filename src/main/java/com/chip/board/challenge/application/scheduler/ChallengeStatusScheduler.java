@@ -21,7 +21,7 @@ public class ChallengeStatusScheduler {
     private final ChallengeLoadPort challengeLoadPort;
     private final ChallengeSyncIndexPort challengeSyncIndexPort;
 
-    @Scheduled(cron = "0 52 16 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 21 12 * * *", zone = "Asia/Seoul")
     public void updateChallengeStatus() {
         challengeStatusService.updateChallengeStatus();
 
