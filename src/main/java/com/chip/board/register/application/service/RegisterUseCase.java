@@ -4,7 +4,7 @@ import com.chip.board.baselinesync.application.port.baselineJob.BaselineEnqueueP
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
 import com.chip.board.register.application.command.RegisterUserCommand;
-import com.chip.board.register.infrastructure.persistence.repository.UserRepository;
+import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.application.port.UserSolvedSyncPort;
 import com.chip.board.register.application.port.VerificationCodeStore;
 import com.chip.board.register.domain.Department;
@@ -21,7 +21,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 @RequiredArgsConstructor
 public class RegisterUseCase {
     private final VerificationCodeStore verificationCodeStore;
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final UserSolvedSyncPort userSolvedSyncPort;
     private final BaselineEnqueuePort baselineEnqueuePort;
@@ -45,7 +45,7 @@ public class RegisterUseCase {
                 .bojId(cmd.bojId())
                 .build();
 
-        userRepository.save(user);
+        userRepositoryPort.save(user);
         userSolvedSyncPort.createInitialSyncState(user);
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override

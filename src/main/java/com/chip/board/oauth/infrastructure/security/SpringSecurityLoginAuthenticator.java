@@ -2,7 +2,7 @@ package com.chip.board.oauth.infrastructure.security;
 
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
-import com.chip.board.oauth.application.component.port.LoginAuthenticator;
+import com.chip.board.oauth.application.port.LoginAuthenticator;
 import com.chip.board.oauth.presentation.dto.request.LoginRequest;
 import com.chip.board.register.domain.CustomUserDetails;
 import lombok.RequiredArgsConstructor;

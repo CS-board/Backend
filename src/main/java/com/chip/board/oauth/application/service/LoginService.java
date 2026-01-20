@@ -7,7 +7,7 @@ import com.chip.board.global.jwt.token.access.AccessTokenData;
 import com.chip.board.global.jwt.token.access.AccessTokenProvider;
 import com.chip.board.global.jwt.token.refresh.RefreshTokenData;
 import com.chip.board.global.jwt.token.refresh.RefreshTokenProvider;
-import com.chip.board.oauth.application.component.port.LoginAuthenticator;
+import com.chip.board.oauth.application.port.LoginAuthenticator;
 import com.chip.board.register.application.component.reader.UserFinder;
 import com.chip.board.oauth.application.component.writer.RefreshTokenWriter;
 import com.chip.board.oauth.application.component.writer.UserWriter;

@@ -3,7 +3,7 @@ package com.chip.board.register.application.service;
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
 import com.chip.board.register.application.command.VerifyEmailCommand;
-import com.chip.board.register.infrastructure.persistence.repository.UserRepository;
+import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.application.port.EmailSender;
 import com.chip.board.register.application.port.VerificationCodeStore;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +18,13 @@ import java.time.Duration;
 public class EmailUseCase {
     private final VerificationCodeStore verificationCodeStore;
     private final EmailSender emailSender;
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepositoryPort;
 
     @Value("${verification.code.expiry-minutes}")
     private int expiryMinutes;
 
     public void sendAuthCode(String email) {
-        if (userRepository.findByUsername(email).isPresent()) {
+        if (userRepositoryPort.findByUsername(email).isPresent()) {
             throw new ServiceException(ErrorCode.USER_ALREADY_EXIST);
         }
 

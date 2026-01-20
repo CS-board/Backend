@@ -6,6 +6,7 @@ import com.chip.board.oauth.presentation.dto.request.LoginRequest;
 import com.chip.board.global.jwt.dto.response.TokenPair;
 import com.chip.board.oauth.application.service.LoginService;
 import com.chip.board.oauth.application.service.TokenRefreshService;
+import com.chip.board.oauth.presentation.mapper.AuthTokenResponseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

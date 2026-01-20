@@ -2,7 +2,7 @@ package com.chip.board.oauth.application.component.reader;
 
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
-import com.chip.board.oauth.application.component.port.RefreshTokenRepository;
+import com.chip.board.oauth.application.port.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
