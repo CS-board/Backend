@@ -6,6 +6,7 @@ import com.chip.board.register.application.port.UserSolvedSyncPort;
 import com.chip.board.register.domain.User;
 import com.chip.board.register.domain.UserSolvedSyncState;
 import com.chip.board.register.infrastructure.persistence.repository.UserSolvedSyncStateRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,16 +21,16 @@ public class UserSolvedSyncAdapter implements UserSolvedSyncPort {
     @Transactional
     public void createInitialSyncState(User savedUser) {
         // 유저당 1행 보장(중복 방지)
-        if (userSolvedSyncStateRepository.existsById(savedUser.getId())) {
+        try {
+            UserSolvedSyncState state = UserSolvedSyncState.builder()
+                    .user(savedUser)
+                    .build();
+            userSolvedSyncStateRepository.save(state);
+        } catch (DataIntegrityViolationException ex) {
             throw new ServiceException(ErrorCode.SYNC_STATE_ALREADY_EXISTS);
         }
-
-        UserSolvedSyncState state = UserSolvedSyncState.builder()
-                .user(savedUser)
-                .build();
-
-        userSolvedSyncStateRepository.save(state);
     }
+
     @Override
     public boolean existsById(Long userId) {
         return userSolvedSyncStateRepository.existsById(userId);

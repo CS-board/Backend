@@ -50,7 +50,7 @@ public class PasswordResetService {
     @Transactional
     public void resetPassword(String email, String newPassword) {
         String stored = passwordResetCodeStore.get(email);
-        if (!"VERIFIED".equals(stored)) {
+        if (!PasswordResetCodeStore.VERIFIED_STATE.equals(stored)) {
             throw new ServiceException(ErrorCode.EMAIL_NOT_VERIFIED);
         }
 
