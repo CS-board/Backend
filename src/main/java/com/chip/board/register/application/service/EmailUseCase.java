@@ -3,7 +3,7 @@ package com.chip.board.register.application.service;
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
 import com.chip.board.register.application.command.VerifyEmailCommand;
-import com.chip.board.register.infrastructure.persistence.repository.UserRepository;
+import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.application.port.EmailSender;
 import com.chip.board.register.application.port.VerificationCodeStore;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +18,19 @@ import java.time.Duration;
 public class EmailUseCase {
     private final VerificationCodeStore verificationCodeStore;
     private final EmailSender emailSender;
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepositoryPort;
 
     @Value("${verification.code.expiry-minutes}")
     private int expiryMinutes;
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     public void sendAuthCode(String email) {
-        if (userRepository.findByUsername(email).isPresent()) {
+        if (userRepositoryPort.findByUsername(email).isPresent()) {
             throw new ServiceException(ErrorCode.USER_ALREADY_EXIST);
         }
 
-        int code = new SecureRandom().nextInt(900000) + 100000;
+        int code = SECURE_RANDOM.nextInt(900000) + 100000;
         verificationCodeStore.saveAuthCode(email, code, Duration.ofMinutes(expiryMinutes));
         emailSender.sendAuthCode(email, code);
     }
@@ -41,9 +43,5 @@ public class EmailUseCase {
             throw new ServiceException(ErrorCode.INVALID_EMAIL_CODE);
         }
         verificationCodeStore.markVerified(cmd.email(), Duration.ofMinutes(expiryMinutes));
-    }
-
-    public void sendTempPassword(String email, String tempPassword) {
-        emailSender.sendTempPassword(email, tempPassword);
     }
 }

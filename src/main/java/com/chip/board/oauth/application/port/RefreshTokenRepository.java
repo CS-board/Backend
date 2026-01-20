@@ -1,4 +1,4 @@
-package com.chip.board.oauth.application.component.port;
+package com.chip.board.oauth.application.port;
 
 import com.chip.board.global.jwt.token.refresh.RefreshTokenData;
 

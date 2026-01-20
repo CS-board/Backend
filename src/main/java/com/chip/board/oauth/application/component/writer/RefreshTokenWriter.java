@@ -1,7 +1,7 @@
 package com.chip.board.oauth.application.component.writer;
 
 import com.chip.board.global.jwt.token.refresh.RefreshTokenData;
-import com.chip.board.oauth.application.component.port.RefreshTokenRepository;
+import com.chip.board.oauth.application.port.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -1,8 +1,8 @@
-package com.chip.board.oauth.infrastructure.persistence;
+package com.chip.board.oauth.infrastructure.persistence.repository;
 
 import com.chip.board.global.jwt.properties.RefreshTokenProperties;
 import com.chip.board.global.jwt.token.refresh.RefreshTokenData;
-import com.chip.board.oauth.application.component.port.RefreshTokenRepository;
+import com.chip.board.oauth.application.port.RefreshTokenRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;

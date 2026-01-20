@@ -1,4 +1,4 @@
-package com.chip.board.oauth.presentation;
+package com.chip.board.oauth.presentation.mapper;
 
 import com.chip.board.global.base.dto.ResponseBody;
 import com.chip.board.global.base.dto.ResponseUtils;

@@ -35,7 +35,7 @@ public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
             "/api/auth/**",
-            "/register/**"
+            "/api/register/**"
     };
 
     private static final String[] PUBLIC_WHITELIST = {

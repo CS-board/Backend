@@ -84,8 +84,11 @@ public class User {
         this.bojId = bojId;
     }
 
-    public void issuePassword(String password) {
-        this.password = password;
+    public void changePassword(String encodedPassword) {
+        if (encodedPassword == null || encodedPassword.isBlank()) {
+            throw new IllegalArgumentException("encodedPassword must not be null/blank");
+        }
+        this.password = encodedPassword;
     }
 
     public void onLoginSuccess() {

@@ -10,8 +10,8 @@ import com.chip.board.global.jwt.token.refresh.RefreshTokenProvider;
 import com.chip.board.oauth.application.component.reader.RefreshTokenFinder;
 import com.chip.board.oauth.application.component.writer.RefreshTokenWriter;
 import com.chip.board.global.jwt.dto.response.TokenPair;
+import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.domain.User;
-import com.chip.board.register.infrastructure.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,7 @@ public class TokenRefreshService {
     private final AccessTokenProvider accessTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
 
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepositoryPort;
 
     @Transactional
     public TokenPair refresh(String rawRefreshToken) {
@@ -36,7 +36,7 @@ public class TokenRefreshService {
 
         refreshTokenWriter.deleteByToken(rawRefreshToken);
 
-        User user = userRepository.findById(userId)
+        User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
         JwtClaims claims = JwtClaims.create(user);
