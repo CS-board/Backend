@@ -1,4 +1,4 @@
-package com.chip.board.syncproblem.application.port;
+package com.chip.board.score.application.port;
 
 public interface ScoreEventPort {
     int insertScoreEventsForUncredited(long challengeId, long userId);

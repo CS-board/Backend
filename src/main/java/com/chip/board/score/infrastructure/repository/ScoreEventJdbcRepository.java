@@ -1,6 +1,6 @@
-package com.chip.board.syncproblem.infrastructure.persistence.repository;
+package com.chip.board.score.infrastructure.repository;
 
-import com.chip.board.syncproblem.application.port.ScoreEventPort;
+import com.chip.board.score.application.port.ScoreEventPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
