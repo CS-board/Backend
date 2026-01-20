@@ -27,11 +27,13 @@ public class PasswordResetService {
     @Value("${verification.code.expiry-minutes}")
     private int expiryMinutes;
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     public void sendResetCode(String email) {
         User user = userRepositoryPort.findByUsername(email)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
-        int code = new SecureRandom().nextInt(900000) + 100000;
+        int code = SECURE_RANDOM.nextInt(900000) + 100000;
         passwordResetCodeStore.saveAuthCode(email, code, Duration.ofMinutes(expiryMinutes));
         emailSender.sendAuthCode(email, code);
     }
@@ -39,7 +41,7 @@ public class PasswordResetService {
     public void verifyCode(String email, String mailCode) {
         String stored = passwordResetCodeStore.get(email);
         if (stored == null) throw new ServiceException(ErrorCode.EXPIRED_EMAIL_CODE);
-        if ("VERIFIED".equals(stored)) return;
+        if (PasswordResetCodeStore.VERIFIED_STATE.equals(stored)) return;
         if (!mailCode.equals(stored)) throw new ServiceException(ErrorCode.INVALID_EMAIL_CODE);
 
         passwordResetCodeStore.markVerified(email, Duration.ofMinutes(expiryMinutes));

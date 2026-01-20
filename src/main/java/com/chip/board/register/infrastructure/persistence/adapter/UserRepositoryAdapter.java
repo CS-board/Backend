@@ -4,11 +4,11 @@ import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.domain.User;
 import com.chip.board.register.infrastructure.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-@Repository
+@Component
 @RequiredArgsConstructor
 public class UserRepositoryAdapter implements UserRepositoryPort {
 

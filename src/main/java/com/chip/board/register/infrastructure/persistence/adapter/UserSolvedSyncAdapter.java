@@ -6,12 +6,12 @@ import com.chip.board.register.application.port.UserSolvedSyncPort;
 import com.chip.board.register.domain.User;
 import com.chip.board.register.domain.UserSolvedSyncState;
 import com.chip.board.register.infrastructure.persistence.repository.UserSolvedSyncStateRepository;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
-@Service
+@Component
 public class UserSolvedSyncAdapter implements UserSolvedSyncPort {
 
     private final UserSolvedSyncStateRepository userSolvedSyncStateRepository;

@@ -1,4 +1,4 @@
-package com.chip.board.oauth.infrastructure.persistence;
+package com.chip.board.oauth.infrastructure.persistence.repository;
 
 import com.chip.board.global.jwt.properties.RefreshTokenProperties;
 import com.chip.board.global.jwt.token.refresh.RefreshTokenData;
