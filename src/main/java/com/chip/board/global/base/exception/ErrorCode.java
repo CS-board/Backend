@@ -54,11 +54,11 @@ public enum ErrorCode {
     CHALLENGE_NOT_FOUND(HttpStatus.NOT_FOUND, "CHALLENGE_004", "챌린지를 찾을 수 없습니다."),
     CHALLENGE_STATUS_INVALID_TRANSITION(HttpStatus.CONFLICT, "CHALLENGE_005", "챌린지 상태 전이가 올바르지 않습니다."),
     CHALLENGE_NOT_IN_ACTIVE_RANGE(HttpStatus.CONFLICT, "CHALLENGE_006", "현재 시각이 챌린지 진행 기간이 아닙니다."),
-    CHALLENGE_ALREADY_EXISTS(HttpStatus.CONFLICT, "CHALLENGE_007", "진행중이거나 예정된 챌린지가 이미 존재합니다.");
+    CHALLENGE_ALREADY_EXISTS(HttpStatus.CONFLICT, "CHALLENGE_007", "진행중이거나 예정된 챌린지가 이미 존재합니다."),
 
-
-
-
+    // Q&A board
+    QNA_QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA_001", "존재하지 않는 게시글입니다."),
+    QNA_QUESTION_FORBIDDEN(HttpStatus.FORBIDDEN, "QNA_002", "해당 게시글에 대한 권한이 없습니다.");
 
 
     private final HttpStatus status;
