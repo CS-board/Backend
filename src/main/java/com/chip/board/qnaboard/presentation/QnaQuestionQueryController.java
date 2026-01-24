@@ -2,8 +2,9 @@ package com.chip.board.qnaboard.presentation;
 
 import com.chip.board.global.base.dto.ResponseBody;
 import com.chip.board.global.base.dto.ResponseUtils;
-import com.chip.board.qnaboard.application.service.QnaQuestionFacade;
-import com.chip.board.qnaboard.presentation.dto.response.*;
+import com.chip.board.qnaboard.application.service.QuestionFacade;
+import com.chip.board.qnaboard.presentation.dto.response.question.QuestionDetailResponse;
+import com.chip.board.qnaboard.presentation.dto.response.question.QuestionListResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/qna/questions")
 public class QnaQuestionQueryController {
 
-    private final QnaQuestionFacade facade;
+    private final QuestionFacade facade;
 
     @GetMapping
     public ResponseEntity<ResponseBody<QuestionListResponse>> list(

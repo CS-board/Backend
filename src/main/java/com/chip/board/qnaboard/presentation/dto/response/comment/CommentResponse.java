@@ -1,4 +1,4 @@
-package com.chip.board.qnaboard.presentation.dto.response;
+package com.chip.board.qnaboard.presentation.dto.response.comment;
 
 public record CommentResponse(
         long id,

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,6 +28,11 @@ public class CommentAdapter implements CommentPort {
     @Override
     public long countByQuestionId(long questionId) {
         return commentJpaRepository.countByQuestionIdAndDeletedFalse(questionId);
+    }
+
+    @Override
+    public Optional<QuestionComment> findActiveById(long commentId) {
+        return commentJpaRepository.findByIdAndDeletedFalse(commentId);
     }
 }
 

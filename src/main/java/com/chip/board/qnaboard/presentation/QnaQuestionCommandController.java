@@ -3,12 +3,11 @@ package com.chip.board.qnaboard.presentation;
 import com.chip.board.global.base.dto.ResponseBody;
 import com.chip.board.global.base.dto.ResponseUtils;
 import com.chip.board.global.jwt.annotation.CurrentUserId;
-import com.chip.board.qnaboard.application.service.QnaQuestionFacade;
-import com.chip.board.qnaboard.presentation.dto.request.CreateCommentRequest;
-import com.chip.board.qnaboard.presentation.dto.request.CreateQuestionRequest;
-import com.chip.board.qnaboard.presentation.dto.request.UpdateQuestionRequest;
-import com.chip.board.qnaboard.presentation.dto.response.IdResponse;
-import com.chip.board.qnaboard.presentation.dto.response.ToggleLikeResponse;
+import com.chip.board.qnaboard.application.service.QuestionFacade;
+import com.chip.board.qnaboard.presentation.dto.request.question.CreateQuestionRequest;
+import com.chip.board.qnaboard.presentation.dto.request.question.UpdateQuestionRequest;
+import com.chip.board.qnaboard.presentation.dto.response.question.IdResponse;
+import com.chip.board.qnaboard.presentation.dto.response.question.ToggleLikeResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
 public class QnaQuestionCommandController {
 
-    private final QnaQuestionFacade facade;
+    private final QuestionFacade facade;
 
     @PostMapping
     public ResponseEntity<ResponseBody<IdResponse>> create(
@@ -34,19 +33,6 @@ public class QnaQuestionCommandController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ResponseUtils.createSuccessResponse(
                         facade.create(req.title(), req.content(), userId)
-                )
-        );
-    }
-
-    @PostMapping("/{id}/comments")
-    public ResponseEntity<ResponseBody<IdResponse>> addComment(
-            @PathVariable long id,
-            @CurrentUserId Long userId,
-            @RequestBody @Valid CreateCommentRequest req
-    ) {
-        return ResponseEntity.ok(
-                ResponseUtils.createSuccessResponse(
-                        facade.addComment(id, userId, req.content())
                 )
         );
     }

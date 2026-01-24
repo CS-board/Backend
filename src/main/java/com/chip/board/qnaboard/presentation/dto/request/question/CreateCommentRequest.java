@@ -1,4 +1,4 @@
-package com.chip.board.qnaboard.presentation.dto.request;
+package com.chip.board.qnaboard.presentation.dto.request.question;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -4,7 +4,8 @@ import com.chip.board.qnaboard.application.component.reader.TimeAgoFormatter;
 import com.chip.board.qnaboard.application.port.LikePort;
 import com.chip.board.qnaboard.application.port.QuestionQueryPort;
 import com.chip.board.qnaboard.infrastructure.persistence.dto.QuestionSummaryRow;
-import com.chip.board.qnaboard.presentation.dto.response.*;
+import com.chip.board.qnaboard.presentation.dto.response.comment.CommentResponse;
+import com.chip.board.qnaboard.presentation.dto.response.question.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class QnaQuestionFacade {
+public class QuestionFacade {
 
     private final QuestionService questionService;
     private final TimeAgoFormatter timeAgoFormatter;
@@ -63,12 +64,6 @@ public class QnaQuestionFacade {
                 detail.likeCount(),
                 comments
         );
-    }
-
-    @Transactional
-    public IdResponse addComment(long questionId, long userId, String content) {
-        long cid = questionService.addComment(questionId, userId, content);
-        return new IdResponse(cid);
     }
 
     @Transactional

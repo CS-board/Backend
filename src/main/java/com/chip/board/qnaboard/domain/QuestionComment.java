@@ -49,4 +49,8 @@ public class QuestionComment {
     }
 
     public void softDelete() { this.deleted = true; }
+
+    public void changeContent(String content) {
+        this.content = content;
+    }
 }
