@@ -38,7 +38,7 @@ public class QuestionComment {
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
     private LocalDateTime createdAt;
 
     public QuestionComment(Long questionId, Long authorId, String authorName, String content) {
@@ -49,4 +49,8 @@ public class QuestionComment {
     }
 
     public void softDelete() { this.deleted = true; }
+
+    public void changeContent(String content) {
+        this.content = content;
+    }
 }

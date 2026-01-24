@@ -47,17 +47,6 @@ public class QuestionService {
         return saved.getId();
     }
 
-    @Transactional
-    public long addComment(long questionId, long userId, String content) {
-        validateQuestionExists(questionId);
-
-        User user = getUserOrThrow(userId);
-        QuestionComment saved = commentPort.save(
-                new QuestionComment(questionId, userId, user.getName(), content)
-        );
-        return saved.getId();
-    }
-
     @Transactional(readOnly = true)
     public List<QuestionComment> listComments(long questionId) {
         validateQuestionExists(questionId);

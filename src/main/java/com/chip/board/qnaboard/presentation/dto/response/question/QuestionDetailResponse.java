@@ -1,4 +1,6 @@
-package com.chip.board.qnaboard.presentation.dto.response;
+package com.chip.board.qnaboard.presentation.dto.response.question;
+
+import com.chip.board.qnaboard.presentation.dto.response.comment.CommentResponse;
 
 import java.util.List;
 

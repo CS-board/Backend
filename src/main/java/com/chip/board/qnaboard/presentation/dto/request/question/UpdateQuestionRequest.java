@@ -1,9 +1,9 @@
-package com.chip.board.qnaboard.presentation.dto.request;
+package com.chip.board.qnaboard.presentation.dto.request.question;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record CreateQuestionRequest(
+public record UpdateQuestionRequest(
         @NotBlank @Size(max = 120) String title,
         @NotBlank String content
 ) {}
