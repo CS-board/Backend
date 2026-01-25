@@ -1,7 +1,7 @@
 package com.chip.board.score.application.service;
 
 import com.chip.board.register.application.port.UserRepositoryPort;
-import com.chip.board.score.infrastructure.persistence.dto.ChallengeRankingRow;
+import com.chip.board.register.application.port.dto.ChallengeRankingRow;
 import com.chip.board.score.presentation.dto.response.ChallengeRankingItemResponse;
 import com.chip.board.score.presentation.dto.response.ChallengeRankingResponse;
 import lombok.RequiredArgsConstructor;

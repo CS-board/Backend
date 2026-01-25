@@ -1,4 +1,4 @@
-package com.chip.board.score.infrastructure.persistence.dto;
+package com.chip.board.register.application.port.dto;
 
 public record ChallengeRankingRow(
         long userId,
