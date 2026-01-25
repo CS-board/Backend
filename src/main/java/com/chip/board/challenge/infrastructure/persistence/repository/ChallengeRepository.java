@@ -42,7 +42,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
         FROM challenge_user_result
         WHERE challenge_id = :challengeId
         """, nativeQuery = true)
-    RankingSummaryAgg findRankingSummaryAgg(@Param("challengeId") long challengeId);
+    RankingSummaryAgg findRankingSummaryAgg(@Param("challengeId") Long challengeId);
 
     interface RankingSummaryAgg {
         Long getParticipantsCount();

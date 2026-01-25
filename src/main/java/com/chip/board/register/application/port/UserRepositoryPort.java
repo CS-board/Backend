@@ -19,5 +19,5 @@ public interface UserRepositoryPort {
 
     Page<ChallengeRankingRow> findRankingsAllUsers(long challengeId, Pageable pageable);
 
-    long countActiveUsers();
+    long countByDeletedFalse();
 }

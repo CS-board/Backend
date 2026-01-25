@@ -28,7 +28,7 @@ public class ChallengeController implements ChallengeSwagger {
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse( challengeCommandService.hold(request)));
     }
 
-    @GetMapping("/{challengeId}/info")
+    @GetMapping("/{challengeId}/info/summary")
     public ResponseEntity<ResponseBody<ChallengeInfoResponse>> info(
             @PathVariable("challengeId") Long challengeId
     ) {
@@ -36,7 +36,7 @@ public class ChallengeController implements ChallengeSwagger {
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(data));
     }
 
-    @GetMapping("/{challengeId}/info/detail")
+    @GetMapping("/{challengeId}/info/details")
     public ResponseEntity<ResponseBody<ChallengeDetailInfoResponse>> detailInfo(
             @PathVariable("challengeId") Long challengeId
     ) {

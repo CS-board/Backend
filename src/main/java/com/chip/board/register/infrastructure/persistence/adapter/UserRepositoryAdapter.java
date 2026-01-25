@@ -43,7 +43,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public long countActiveUsers() {
-        return userRepository.countActiveUsers();
+    public long countByDeletedFalse() {
+        return userRepository.countByDeletedFalse();
     }
 }

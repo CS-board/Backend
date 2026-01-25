@@ -39,7 +39,7 @@ public class ChallengePersistenceAdapter implements ChallengeLoadPort, Challenge
     }
 
     @Override
-    public Optional<Challenge> findById(long id) {
+    public Optional<Challenge> findById(Long id) {
         return challengeRepository.findById(id);
     }
 
@@ -83,13 +83,13 @@ public class ChallengePersistenceAdapter implements ChallengeLoadPort, Challenge
     }
 
     @Override
-    public ChallengeRankingAggregate getRankingAggregate(long challengeId) {
-        long totalUserCount = userRepositoryPort.countActiveUsers();
+    public ChallengeRankingAggregate getRankingAggregate(Long challengeId) {
+        long totalUserCount = userRepositoryPort.countByDeletedFalse();
 
         ChallengeRepository.RankingSummaryAgg agg = challengeRepository.findRankingSummaryAgg(challengeId);
 
-        long participantsCount = (agg.getParticipantsCount() == null) ? 0L : agg.getParticipantsCount();
-        long totalSolvedCount = (agg.getTotalSolvedCount() == null) ? 0L : agg.getTotalSolvedCount();
+        long participantsCount = agg.getParticipantsCount();
+        long totalSolvedCount = agg.getTotalSolvedCount();
 
         return new ChallengeRankingAggregate(
                 totalUserCount,

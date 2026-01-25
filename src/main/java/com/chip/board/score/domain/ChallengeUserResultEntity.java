@@ -40,12 +40,12 @@ public class ChallengeUserResultEntity {
     private LocalDateTime updatedAt;
 
     public static ChallengeUserResultEntity of(long challengeId, long userId) {
-        ChallengeUserResultEntity e = new ChallengeUserResultEntity();
-        e.id = new ChallengeUserResultId(challengeId, userId);
-        e.solvedCount = 0;
-        e.totalPoints = 0L;
-        e.lastRankNo = null;
-        e.currentRankNo = null;
-        return e;
+        ChallengeUserResultEntity challengeUserResultEntity = new ChallengeUserResultEntity();
+        challengeUserResultEntity.id = new ChallengeUserResultId(challengeId, userId);
+        challengeUserResultEntity.solvedCount = 0;
+        challengeUserResultEntity.totalPoints = 0L;
+        challengeUserResultEntity.lastRankNo = null;
+        challengeUserResultEntity.currentRankNo = null;
+        return challengeUserResultEntity;
     }
 }

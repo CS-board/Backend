@@ -58,17 +58,17 @@ public class ChallengeCommandService {
     }
 
     @Transactional(readOnly = true)
-    public ChallengeDetailInfoResponse getDetailInfo(long challengeId) {
-        Challenge c = challengeLoadPort.findById(challengeId)
+    public ChallengeDetailInfoResponse getDetailInfo(Long challengeId) {
+        Challenge challenge = challengeLoadPort.findById(challengeId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.CHALLENGE_NOT_FOUND));
 
         ChallengeRankingAggregate agg = challengeLoadPort.getRankingAggregate(challengeId);
 
         return new ChallengeDetailInfoResponse(
-                c.getTitle(),
-                c.getStartAt(),
-                c.getEndAt(),
-                c.getStatus(),
+                challenge.getTitle(),
+                challenge.getStartAt(),
+                challenge.getEndAt(),
+                challenge.getStatus(),
                 agg.totalUserCount(),
                 agg.participantsCount(),
                 agg.totalSolvedCount(),

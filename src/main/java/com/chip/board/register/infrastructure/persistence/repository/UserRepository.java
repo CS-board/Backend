@@ -45,6 +45,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 """)
     Page<ChallengeRankingRow> findRankingsAllUsers(@Param("challengeId") long challengeId, Pageable pageable);
 
-    @Query(value = "SELECT COUNT(*) FROM `user` WHERE is_deleted = false", nativeQuery = true)
-    long countActiveUsers();
+    long countByDeletedFalse();
 }

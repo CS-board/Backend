@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface ChallengeLoadPort {
     Optional<Challenge> findActive();
     Optional<Challenge> findFirstOpen(); // ACTIVE/SCHEDULED 중 하나 (정렬/우선순위 포함)
-    Optional<Challenge> findById(long id);
+    Optional<Challenge> findById(Long id);
     boolean existsAnyOpen(); // ACTIVE or SCHEDULED
     boolean existsOverlappingRange(LocalDateTime startAt, LocalDateTime endAt);
 
@@ -18,5 +18,5 @@ public interface ChallengeLoadPort {
     boolean existsClosedUnfinalized();
     Optional<ChallengeSyncSnapshot> findCurrentSyncTarget();
 
-    ChallengeRankingAggregate getRankingAggregate(long challengeId);
+    ChallengeRankingAggregate getRankingAggregate(Long challengeId);
 }
