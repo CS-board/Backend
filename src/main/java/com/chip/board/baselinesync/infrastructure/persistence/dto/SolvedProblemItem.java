@@ -1,3 +1,3 @@
 package com.chip.board.baselinesync.infrastructure.persistence.dto;
 
-public record SolvedProblemItem(Integer problemId, Integer level, String titleKo) {}
+public record SolvedProblemItem(int problemId, Integer level, String titleKo) {}

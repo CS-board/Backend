@@ -20,11 +20,8 @@ public class UserSolvedProblemPortAdapter implements UserSolvedProblemPort {
         if (items == null || items.isEmpty()) return;
 
         // infra dto로 변환
-        List<SolvedProblemItem> mapped =
-                items.stream()
-                        .map(i -> new SolvedProblemItem(i.problemId(), i.level(), i.titleKo()))
-                        .toList();
 
-        userSolvedProblemJdbcRepository.upsertBatch(userId, mapped, mode);
+
+        userSolvedProblemJdbcRepository.upsertBatch(userId, items, mode);
     }
 }

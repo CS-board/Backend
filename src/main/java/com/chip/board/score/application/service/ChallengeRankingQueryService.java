@@ -25,7 +25,10 @@ public class ChallengeRankingQueryService {
     private final ChallengeLoadPort challengeLoadPort;
 
     public ChallengeRankingResponse getRankingsAllUsers(Long challengeId, int page, int size) {
+        if (challengeId == null) {
+            throw new ServiceException(ErrorCode.CHALLENGE_NOT_FOUND);
 
+        }
         challengeLoadPort.findById(challengeId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.CHALLENGE_NOT_FOUND));
 

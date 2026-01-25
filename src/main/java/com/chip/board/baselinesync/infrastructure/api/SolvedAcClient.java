@@ -191,7 +191,7 @@ public class SolvedAcClient implements SolvedAcPort {
         List<SolvedProblemItem> mapped = raw.stream()
                 .filter(it -> it.problemId() != null)
                 .filter(it -> it.level() != null)
-                .map(it -> new SolvedProblemItem(it.problemId(), it.level(), it.titleKo()))                .toList();
+                .map(it -> new SolvedProblemItem(it.problemId(), it.level(), it.titleKo())).toList();
 
         return new SolvedProblemPage(total, mapped);
     }
