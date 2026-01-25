@@ -3,9 +3,12 @@ package com.chip.board.register.infrastructure.persistence.adapter;
 import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.domain.User;
 import com.chip.board.register.infrastructure.persistence.repository.UserRepository;
+import com.chip.board.score.infrastructure.persistence.dto.ChallengeRankingRow;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
-
+import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 @Component
@@ -32,5 +35,15 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public Page<ChallengeRankingRow> findRankingsAllUsers(long challengeId, Pageable pageable) {
+        return userRepository.findRankingsAllUsers(challengeId, pageable);
+    }
+
+    @Override
+    public long countActiveUsers() {
+        return userRepository.countActiveUsers();
     }
 }

@@ -1,5 +1,6 @@
 package com.chip.board.challenge.application.port;
 
+import com.chip.board.challenge.application.port.dto.ChallengeRankingAggregate;
 import com.chip.board.challenge.domain.Challenge;
 import com.chip.board.syncproblem.application.port.dto.ChallengeSyncSnapshot;
 
@@ -16,4 +17,6 @@ public interface ChallengeLoadPort {
     boolean existsActive();
     boolean existsClosedUnfinalized();
     Optional<ChallengeSyncSnapshot> findCurrentSyncTarget();
+
+    ChallengeRankingAggregate getRankingAggregate(long challengeId);
 }
