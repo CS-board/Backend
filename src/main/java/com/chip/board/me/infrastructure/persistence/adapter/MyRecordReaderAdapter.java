@@ -1,5 +1,7 @@
 package com.chip.board.me.infrastructure.persistence.adapter;
 
+import com.chip.board.global.base.exception.ErrorCode;
+import com.chip.board.global.base.exception.ServiceException;
 import com.chip.board.me.application.port.MyRecordReader;
 import com.chip.board.me.application.service.model.MyRecordSummary;
 import com.chip.board.me.application.service.model.MyRecordWeek;
@@ -23,7 +25,18 @@ public class MyRecordReaderAdapter implements MyRecordReader {
 
     @Override
     public PagedResult<MyRecordWeek> loadWeeks(long userId, int page, int size) {
-        int offset = page * size;
+        if (page < 0 || size <= 0) {
+            throw new ServiceException(ErrorCode.INVALID_PAGE);
+        }
+
+        final int offset;
+        try {
+            long offsetL = Math.multiplyExact((long) page, (long) size);
+            if (offsetL > Integer.MAX_VALUE) throw new ServiceException(ErrorCode.INVALID_PAGE);
+            offset = (int) offsetL;
+        } catch (ArithmeticException e) {
+            throw new ServiceException(ErrorCode.INVALID_PAGE);
+        }
 
         List<MyRecordWeek> rows = myRecordJdbcRepository.findWeeks(userId, size + 1, offset);
 

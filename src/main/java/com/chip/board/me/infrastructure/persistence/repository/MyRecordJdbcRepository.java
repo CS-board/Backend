@@ -15,22 +15,24 @@ public class MyRecordJdbcRepository {
     private final JdbcTemplate jdbc;
 
     public MyRecordSummary findSummary(long userId) {
-        return jdbc.query("""
-                SELECT
-                    COALESCE(MAX(cur.total_points), 0) AS max_points,
-                    COALESCE(SUM(cur.solved_count), 0) AS total_solved
-                FROM challenge_user_result cur
-                JOIN challenge c ON c.challenge_id = cur.challenge_id
-                WHERE cur.user_id = ?
-                  AND c.status = 'CLOSED'
-                  AND c.close_finalized = TRUE
-                """, rs -> {
-            rs.next();
-            long maxPoints = rs.getLong("max_points");
-            int totalSolved = rs.getInt("total_solved");
-            return new MyRecordSummary(maxPoints, totalSolved);
-        }, userId);
+        return jdbc.queryForObject("""
+            SELECT
+                COALESCE(MAX(cur.total_points), 0) AS max_points,
+                COALESCE(SUM(cur.solved_count), 0) AS total_solved
+            FROM challenge_user_result cur
+            JOIN challenge c ON c.challenge_id = cur.challenge_id
+            WHERE cur.user_id = ?
+              AND c.status = 'CLOSED'
+              AND c.close_finalized = TRUE
+            """,
+                (rs, rowNum) -> new MyRecordSummary(
+                        rs.getLong("max_points"),
+                        rs.getInt("total_solved")
+                ),
+                userId
+        );
     }
+
 
     /**
      * size+1개를 받아와서 hasNext 판단용으로 사용
