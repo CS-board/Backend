@@ -3,7 +3,7 @@ package com.chip.board.me.application.service;
 import com.chip.board.challenge.application.port.ChallengeLoadPort;
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
-import com.chip.board.me.application.port.MeQueryPort;
+import com.chip.board.me.application.port.DailySolvedProblemQueryPort;
 import com.chip.board.me.presentation.dto.response.DailySolvedProblemsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -19,7 +18,7 @@ import java.util.List;
 public class DailySolvedProblemQueryService {
 
     private final ChallengeLoadPort challengeLoadPort;
-    private final MeQueryPort dailySolvedProblemQueryPort;
+    private final DailySolvedProblemQueryPort dailySolvedProblemQueryPort;
     private final Clock clock;
 
     public DailySolvedProblemsResponse getDailySolvedProblems(long userId, long challengeId, LocalDate date) {
@@ -30,12 +29,12 @@ public class DailySolvedProblemQueryService {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.plusDays(1).atStartOfDay();
 
-        List<MeQueryPort.Row> rows = dailySolvedProblemQueryPort.findByUserIdAndChallengeIdBetween(
+        List<DailySolvedProblemQueryPort.Row> rows = dailySolvedProblemQueryPort.findByUserIdAndChallengeIdBetween(
                 userId, challengeId, start, end
         );
 
         List<DailySolvedProblemsResponse.Item> items = rows.stream()
-                .map((MeQueryPort.Row r) -> new DailySolvedProblemsResponse.Item(
+                .map((DailySolvedProblemQueryPort.Row r) -> new DailySolvedProblemsResponse.Item(
                         r.problemId(),
                         r.titleKo(),
                         r.level(),

@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface MeQueryPort {
+public interface DailySolvedProblemQueryPort {
 
     List<Row> findByUserIdAndChallengeIdBetween(
             long userId,

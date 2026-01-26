@@ -6,9 +6,13 @@ import com.chip.board.global.config.swagger.SwaggerApiFailedResponse;
 import com.chip.board.global.config.swagger.SwaggerApiResponses;
 import com.chip.board.global.config.swagger.SwaggerApiSuccessResponse;
 import com.chip.board.me.presentation.dto.response.DailySolvedProblemsResponse;
+import com.chip.board.me.presentation.dto.response.MyRecordSummaryResponse;
+import com.chip.board.me.presentation.dto.response.MyRecordWeeksResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -19,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 
-@Tag(name = "Me Challenge", description = "내 챌린지 관련 API")
+@Tag(name = "Me Record", description = "내 기록/챌린지 관련 API")
 public interface MeSwagger {
 
     @Operation(
@@ -54,5 +58,61 @@ public interface MeSwagger {
                     example = "2026-01-25"
             )
             @RequestParam("date") @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    );
+
+    @Operation(
+            summary = "내 기록 요약 조회",
+            description = "로그인한 사용자의 기록(요약) 정보를 조회합니다."
+    )
+    @SwaggerApiResponses(
+            success = @SwaggerApiSuccessResponse(
+                    status = HttpStatus.OK,
+                    response = MyRecordSummaryResponse.class,
+                    description = "내 기록 요약 조회 성공"
+            ),
+            errors = {
+                    // 필요 시 ErrorCode 추가
+            }
+    )
+    @GetMapping("/summary")
+    ResponseEntity<ResponseBody<MyRecordSummaryResponse>> summary(
+            @Parameter(hidden = true)
+            Long userId
+    );
+
+    @Operation(
+            summary = "주차별 기록 요약 목록 조회",
+            description = "로그인한 사용자의 주차별 기록 요약을 페이지네이션으로 조회합니다."
+    )
+    @SwaggerApiResponses(
+            success = @SwaggerApiSuccessResponse(
+                    status = HttpStatus.OK,
+                    response = MyRecordWeeksResponse.class,
+                    description = "주차별 기록 요약 목록 조회 성공"
+            ),
+            errors = {
+                    // 필요 시 ErrorCode 추가
+            }
+    )
+    @GetMapping("/weeks")
+    ResponseEntity<ResponseBody<MyRecordWeeksResponse>> weeks(
+            @Parameter(hidden = true)
+            Long userId,
+
+            @Parameter(
+                    name = "page",
+                    description = "페이지(0부터)",
+                    required = false,
+                    example = "0"
+            )
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+
+            @Parameter(
+                    name = "size",
+                    description = "페이지 크기(1~100)",
+                    required = false,
+                    example = "10"
+            )
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size
     );
 }

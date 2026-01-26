@@ -62,7 +62,11 @@ public enum ErrorCode {
 
     // 댓글 전용
     QNA_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA_101", "존재하지 않는 댓글입니다."),
-    QNA_COMMENT_FORBIDDEN(HttpStatus.FORBIDDEN, "QNA_102", "해당 댓글에 대한 권한이 없습니다.");
+    QNA_COMMENT_FORBIDDEN(HttpStatus.FORBIDDEN, "QNA_102", "해당 댓글에 대한 권한이 없습니다."),
+
+    // 개인 기록 조회
+    INVALID_PAGE(HttpStatus.BAD_REQUEST, "INVALID_PAGE", "page 또는 size 값이 올바르지 않습니다.");
+
 
     private final HttpStatus status;
     private final String code;

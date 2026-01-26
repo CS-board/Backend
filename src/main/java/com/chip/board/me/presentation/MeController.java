@@ -4,8 +4,13 @@ import com.chip.board.global.base.dto.ResponseBody;
 import com.chip.board.global.base.dto.ResponseUtils;
 import com.chip.board.global.jwt.annotation.CurrentUserId;
 import com.chip.board.me.application.service.DailySolvedProblemQueryService;
+import com.chip.board.me.application.service.MyRecordQueryService;
 import com.chip.board.me.presentation.dto.response.DailySolvedProblemsResponse;
+import com.chip.board.me.presentation.dto.response.MyRecordSummaryResponse;
+import com.chip.board.me.presentation.dto.response.MyRecordWeeksResponse;
 import com.chip.board.me.presentation.swagger.MeSwagger;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,10 +25,11 @@ import java.time.LocalDate;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/me/challenges")
+@RequestMapping("/api/me/records")
 public class MeController implements MeSwagger {
 
     private final DailySolvedProblemQueryService dailySolvedProblemQueryService;
+    private final MyRecordQueryService myRecordQueryService;
 
     @GetMapping("/{challengeId}/solved-problems")
     public ResponseEntity<ResponseBody<DailySolvedProblemsResponse>> getDailySolvedProblems(
@@ -32,6 +38,24 @@ public class MeController implements MeSwagger {
             @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         DailySolvedProblemsResponse res = dailySolvedProblemQueryService.getDailySolvedProblems(userId, challengeId, date);
+        return ResponseEntity.ok(ResponseUtils.createSuccessResponse(res));
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<ResponseBody<MyRecordSummaryResponse>> summary(
+            @CurrentUserId Long userId
+    ) {
+        MyRecordSummaryResponse res = myRecordQueryService.getSummary(userId);
+        return ResponseEntity.ok(ResponseUtils.createSuccessResponse(res));
+    }
+
+    @GetMapping("/weeks")
+    public ResponseEntity<ResponseBody<MyRecordWeeksResponse>> weeks(
+            @CurrentUserId Long userId,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size
+    ) {
+        MyRecordWeeksResponse res = myRecordQueryService.getWeeksSummary(userId, page, size);
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(res));
     }
 }

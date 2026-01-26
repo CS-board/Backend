@@ -1,4 +1,4 @@
-package com.chip.board.qnaboard.infrastructure.adapter;
+package com.chip.board.qnaboard.infrastructure.persistence.adapter;
 
 import com.chip.board.qnaboard.application.port.CommentPort;
 import com.chip.board.qnaboard.domain.QuestionComment;
