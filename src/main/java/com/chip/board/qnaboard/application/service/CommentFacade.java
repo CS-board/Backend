@@ -1,12 +1,6 @@
 package com.chip.board.qnaboard.application.service;
 
-import com.chip.board.global.base.exception.ErrorCode;
-import com.chip.board.global.base.exception.ServiceException;
-import com.chip.board.qnaboard.application.port.CommentPort;
-import com.chip.board.qnaboard.domain.QuestionComment;
 import com.chip.board.qnaboard.presentation.dto.response.question.IdResponse;
-import com.chip.board.register.application.port.UserRepositoryPort;
-import com.chip.board.register.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

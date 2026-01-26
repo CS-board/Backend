@@ -1,4 +1,4 @@
-package com.chip.board.score.infrastructure.adapter;
+package com.chip.board.score.infrastructure.persistence.adapter;
 
 import com.chip.board.score.application.port.ChallengeUserResultPort;
 import lombok.RequiredArgsConstructor;

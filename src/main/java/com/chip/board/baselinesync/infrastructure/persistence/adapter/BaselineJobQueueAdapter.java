@@ -1,4 +1,4 @@
-package com.chip.board.baselinesync.infrastructure.adapter;
+package com.chip.board.baselinesync.infrastructure.persistence.adapter;
 
 import com.chip.board.baselinesync.application.port.baselineJob.BaselineJobQueuePort;
 import com.chip.board.global.infrastructure.RedisZSetJobQueueRepository;

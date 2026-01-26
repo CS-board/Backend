@@ -1,4 +1,4 @@
-package com.chip.board.qnaboard.infrastructure.adapter;
+package com.chip.board.qnaboard.infrastructure.persistence.adapter;
 
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
