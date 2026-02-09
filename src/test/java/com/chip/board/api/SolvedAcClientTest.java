@@ -13,7 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,11 +49,17 @@ class SolvedAcClientTest {
         RestClient.Builder builder = RestClient.builder();
         server = MockRestServiceServer.bindTo(builder).build();
 
+        Clock clock = Clock.fixed(
+                Instant.parse("2026-02-09T11:14:23Z"),
+                ZoneId.of("Asia/Seoul")
+        );
+
         solvedAcClient = new SolvedAcClient(
                 builder,
                 redis,
                 "https://solved.ac",
-                externalApiCooldownPort
+                externalApiCooldownPort,
+                clock
         );
     }
 

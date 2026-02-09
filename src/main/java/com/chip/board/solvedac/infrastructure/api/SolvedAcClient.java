@@ -17,10 +17,9 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
+import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @Slf4j
@@ -36,13 +35,15 @@ public class SolvedAcClient implements SolvedAcPort {
     private final RestClient restClient;
     private final StringRedisTemplate redis;
     private static final String API_KEY_SOLVED_AC = "solved.ac";
+    private final Clock clock;
 
     private final ExternalApiCooldownPort externalApiCooldownPort;
 
     public SolvedAcClient(RestClient.Builder builder,
                           StringRedisTemplate redis,
                           @Value("${solved-ac.base-url}") String baseUrl,
-                          ExternalApiCooldownPort externalApiCooldownPort) {
+                          ExternalApiCooldownPort externalApiCooldownPort,
+                          Clock clock) {
 
         this.restClient = builder
                 .baseUrl(baseUrl)
@@ -51,6 +52,7 @@ public class SolvedAcClient implements SolvedAcPort {
                 .build();
         this.redis = redis;
         this.externalApiCooldownPort = externalApiCooldownPort;
+        this.clock = clock;
     }
 
     /** 전역 gate 활성 여부 */
@@ -72,7 +74,10 @@ public class SolvedAcClient implements SolvedAcPort {
     }
 
     private void afterOk(long now) { setGateMs(now + OK_INTERVAL_MS); }
-    private void after429(long now) { setGateMs(now + COOLDOWN_429_MS); }
+    private void after429(long now) {
+        setGateMs(now + COOLDOWN_429_MS);
+        record429Cooldown();
+    }
     private void afterTransient(long now) { setGateMs(now + BACKOFF_5XX_NET_MS); }
 
     public SolvedAcSearchProblemResponse searchSolvedProblemsSafe(String handle, int page) {
@@ -98,7 +103,6 @@ public class SolvedAcClient implements SolvedAcPort {
             int code = e.getStatusCode().value();
             if (code == 429) {
                 after429(now);
-                record429Cooldown(now);
             } else {
                 // 단순 처리: 429 외 4xx도 다음 호출은 5초 뒤로만 밀고 null
                 afterOk(now);
@@ -143,7 +147,6 @@ public class SolvedAcClient implements SolvedAcPort {
             int code = e.getStatusCode().value();
             if (code == 429) {
                 after429(now);
-                record429Cooldown(now);
             } else {
                 afterOk(now);
             }
@@ -207,11 +210,8 @@ public class SolvedAcClient implements SolvedAcPort {
         return new SolvedProblemPage(total, mapped);
     }
 
-    private void record429Cooldown(long nowMs) {
-        LocalDateTime startedAtUtc = LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(nowMs),
-                ZoneOffset.UTC
-        );
-        externalApiCooldownPort.upsert429Cooldown(API_KEY_SOLVED_AC, startedAtUtc);
+    private void record429Cooldown() {
+        LocalDateTime now = LocalDateTime.now(clock);
+        externalApiCooldownPort.upsert429Cooldown(API_KEY_SOLVED_AC, now);
     }
 }

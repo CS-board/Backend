@@ -14,8 +14,10 @@ public class ExternalApiCooldownPersistenceAdapter implements ExternalApiCooldow
 
     private final JdbcTemplate jdbcTemplate;
 
+    private static final int STATUS_429_COOLDOWN = 1;
+
     @Override
-    public void upsert429Cooldown(String apiKey, LocalDateTime cooldownStartedAt) {
+    public void upsert429Cooldown(String apiKey, LocalDateTime cooldownStartedAtUtc) {
         jdbcTemplate.update(
                 """
                 INSERT INTO external_api_cooldown (api_key, cooldown_started_at, status)
@@ -25,8 +27,8 @@ public class ExternalApiCooldownPersistenceAdapter implements ExternalApiCooldow
                     status = VALUES(status)
                 """,
                 apiKey,
-                Timestamp.valueOf(cooldownStartedAt),
-                1
+                Timestamp.valueOf(cooldownStartedAtUtc),
+                STATUS_429_COOLDOWN
         );
     }
 }
