@@ -1,4 +1,4 @@
-package com.chip.board.baselinesync.infrastructure.api.dto.response;
+package com.chip.board.solvedac.infrastructure.api.dto.response;
 
 import java.util.List;
 

@@ -25,7 +25,7 @@ public enum ErrorCode {
     INVALID_LOGIN(HttpStatus.UNAUTHORIZED,"AUTH_006","아이디 또는 비밀번호가 일치하지 않습니다."),
     REFRESH_TOKEN_INVALID(UNAUTHORIZED, "AUTH_007", "RefreshToken이 존재하지 않습니다."),
     BAEKJOON_HANDLE_INVALID(BAD_REQUEST, "AUTH_008", "유효하지 않은 백준 아이디입니다."),
-    SOLVEDAC_COOLDOWN_ACTIVE(TOO_MANY_REQUESTS, "AUTH_009", "요청이 많습니다. 10분 후 다시 시도해주세요."),
+    SOLVEDAC_COOLDOWN_ACTIVE(TOO_MANY_REQUESTS, "AUTH_009", "요청이 많습니다. 잠시 후 다시 시도해주세요."),
 
     //User
     USER_ALREADY_EXIST(HttpStatus.CONFLICT,"USER_001","이미 존재하는 회원입니다."),

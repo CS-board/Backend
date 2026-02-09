@@ -18,10 +18,12 @@ public class SolvedacConfig {
     TransactionTemplate transactionTemplate(PlatformTransactionManager tm) {
         return new TransactionTemplate(tm);
     }
+
     @Bean
     public Clock clock() {
         return Clock.system(ZoneId.of("Asia/Seoul"));
     }
+
     @Bean
     public RestClient.Builder solvedAcRestClientBuilder() {
         // connect timeout
