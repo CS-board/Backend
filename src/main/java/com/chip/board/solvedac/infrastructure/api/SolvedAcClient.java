@@ -76,7 +76,11 @@ public class SolvedAcClient implements SolvedAcPort {
     private void afterOk(long now) { setGateMs(now + OK_INTERVAL_MS); }
     private void after429(long now) {
         setGateMs(now + COOLDOWN_429_MS);
-        record429Cooldown();
+        try {
+           record429Cooldown();
+             } catch (Exception e) {
+                log.warn("Failed to record 429 cooldown to DB", e);
+            }
     }
     private void afterTransient(long now) { setGateMs(now + BACKOFF_5XX_NET_MS); }
 
