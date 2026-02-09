@@ -1,6 +1,6 @@
 package com.chip.board.register.application.service;
 
-import com.chip.board.baselinesync.application.port.api.SolvedAcPort;
+import com.chip.board.solvedac.application.port.api.SolvedAcPort;
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
 import com.chip.board.register.application.port.UserRepositoryPort;

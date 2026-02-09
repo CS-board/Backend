@@ -1,12 +1,12 @@
 package com.chip.board.baselinesync.application.service;
 
-import com.chip.board.baselinesync.application.port.api.SolvedAcPort;
+import com.chip.board.solvedac.application.port.api.SolvedAcPort;
 import com.chip.board.baselinesync.application.port.baselineJob.BaselineJobQueuePort;
 import com.chip.board.baselinesync.application.port.solvedproblem.UserSolvedProblemPort;
 import com.chip.board.baselinesync.application.port.syncstate.SyncStateCommandPort;
 import com.chip.board.baselinesync.application.port.syncstate.SyncStateQueryPort;
 import com.chip.board.baselinesync.domain.CreditedAtMode;
-import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedProblemPage;
+import com.chip.board.solvedac.infrastructure.api.dto.response.SolvedProblemPage;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.BaselineTarget;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SolvedProblemItem;
 import lombok.RequiredArgsConstructor;

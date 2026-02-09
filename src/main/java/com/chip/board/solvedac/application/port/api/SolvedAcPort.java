@@ -1,6 +1,6 @@
-package com.chip.board.baselinesync.application.port.api;
+package com.chip.board.solvedac.application.port.api;
 
-import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedProblemPage;
+import com.chip.board.solvedac.infrastructure.api.dto.response.SolvedProblemPage;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SolvedProblemItem;
 
 import java.util.List;

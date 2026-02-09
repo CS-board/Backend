@@ -1,6 +1,6 @@
 package com.chip.board.syncproblem.application.service;
 
-import com.chip.board.baselinesync.application.port.api.SolvedAcPort;
+import com.chip.board.solvedac.application.port.api.SolvedAcPort;
 import com.chip.board.baselinesync.application.port.solvedproblem.UserSolvedProblemPort;
 import com.chip.board.baselinesync.application.port.syncstate.SyncStateCommandPort;
 import com.chip.board.baselinesync.application.port.syncstate.SyncStateQueryPort;

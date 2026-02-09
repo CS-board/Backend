@@ -1,9 +1,10 @@
-package com.chip.board.baselinesync.infrastructure.api;
+package com.chip.board.solvedac.infrastructure.api;
 
-import com.chip.board.baselinesync.application.port.api.SolvedAcPort;
-import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedAcSearchProblemResponse;
-import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedAcUserShowResponse;
-import com.chip.board.baselinesync.infrastructure.api.dto.response.SolvedProblemPage;
+import com.chip.board.solvedac.application.port.api.SolvedAcPort;
+import com.chip.board.solvedac.application.port.cooldown.ExternalApiCooldownPort;
+import com.chip.board.solvedac.infrastructure.api.dto.response.SolvedAcSearchProblemResponse;
+import com.chip.board.solvedac.infrastructure.api.dto.response.SolvedAcUserShowResponse;
+import com.chip.board.solvedac.infrastructure.api.dto.response.SolvedProblemPage;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SolvedProblemItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Slf4j
@@ -31,10 +35,14 @@ public class SolvedAcClient implements SolvedAcPort {
 
     private final RestClient restClient;
     private final StringRedisTemplate redis;
+    private static final String API_KEY_SOLVED_AC = "solved.ac";
+
+    private final ExternalApiCooldownPort externalApiCooldownPort;
 
     public SolvedAcClient(RestClient.Builder builder,
                           StringRedisTemplate redis,
-                          @Value("${solved-ac.base-url}") String baseUrl) {
+                          @Value("${solved-ac.base-url}") String baseUrl,
+                          ExternalApiCooldownPort externalApiCooldownPort) {
 
         this.restClient = builder
                 .baseUrl(baseUrl)
@@ -42,6 +50,7 @@ public class SolvedAcClient implements SolvedAcPort {
                 .defaultHeader("x-solvedac-language", "ko")
                 .build();
         this.redis = redis;
+        this.externalApiCooldownPort = externalApiCooldownPort;
     }
 
     /** 전역 gate 활성 여부 */
@@ -89,6 +98,7 @@ public class SolvedAcClient implements SolvedAcPort {
             int code = e.getStatusCode().value();
             if (code == 429) {
                 after429(now);
+                record429Cooldown(now);
             } else {
                 // 단순 처리: 429 외 4xx도 다음 호출은 5초 뒤로만 밀고 null
                 afterOk(now);
@@ -133,6 +143,7 @@ public class SolvedAcClient implements SolvedAcPort {
             int code = e.getStatusCode().value();
             if (code == 429) {
                 after429(now);
+                record429Cooldown(now);
             } else {
                 afterOk(now);
             }
@@ -194,5 +205,13 @@ public class SolvedAcClient implements SolvedAcPort {
                 .map(it -> new SolvedProblemItem(it.problemId(), it.level(), it.titleKo())).toList();
 
         return new SolvedProblemPage(total, mapped);
+    }
+
+    private void record429Cooldown(long nowMs) {
+        LocalDateTime startedAtUtc = LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(nowMs),
+                ZoneOffset.UTC
+        );
+        externalApiCooldownPort.upsert429Cooldown(API_KEY_SOLVED_AC, startedAtUtc);
     }
 }
