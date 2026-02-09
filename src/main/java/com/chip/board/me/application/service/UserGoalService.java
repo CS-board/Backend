@@ -17,16 +17,18 @@ public class UserGoalService {
     public void updateMyGoalPoints(long userId, long goalPoints) {
         if (goalPoints < 0) throw new ServiceException(ErrorCode.INVALID_GOAL_POINTS);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
-
+        User user = findUserById(userId);
         user.changeGoalPoints(goalPoints);
     }
 
     @Transactional(readOnly = true)
     public long loadMyGoalPoints(long userId) {
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+        User user = findUserById(userId);
         return user.getGoalPoints();
+    }
+
+    private User findUserById(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
     }
 }

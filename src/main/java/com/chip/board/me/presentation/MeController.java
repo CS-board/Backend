@@ -60,7 +60,7 @@ public class MeController implements MeSwagger {
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(res));
     }
 
-    @GetMapping("/{challengeId}/summary")
+    @GetMapping("/{challengeId}/progress-summary")
     public ResponseEntity<ResponseBody<MyChallengeSummaryResponse>> myChallengeProgressSummary(
             @PathVariable Long challengeId,
             @CurrentUserId Long userId

@@ -88,7 +88,7 @@ public class MyRecordJdbcRepository {
                   AND se.created_at >= TIMESTAMP(CURRENT_DATE)
                 """, Long.class, challengeId, userId);
 
-        return (v == null) ? 0L : v;
+        return v;
     }
 
     public record CurrentRow(Integer currentRank, long currentScore) {}

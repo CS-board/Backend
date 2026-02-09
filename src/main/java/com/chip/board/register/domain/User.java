@@ -53,7 +53,7 @@ public class User {
     @Column(name = "boj_id", nullable = false, length = 64)
     private String bojId;
 
-    @Column(name = "goal_points", nullable = false, length = 64)
+    @Column(name = "goal_points", nullable = false)
     private long goalPoints;
 
     @Column(name = "is_deleted")
