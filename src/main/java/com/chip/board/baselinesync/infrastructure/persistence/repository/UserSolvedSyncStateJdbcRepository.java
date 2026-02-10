@@ -187,6 +187,7 @@ public class UserSolvedSyncStateJdbcRepository implements SyncStateQueryPort, Sy
               AND (s.observed_at IS NULL OR s.observed_at < ?)
               AND u.boj_id IS NOT NULL
               AND u.boj_id <> ''
+              AND u.is_deleted = 0
             ORDER BY s.user_id ASC
             """;
 

@@ -39,6 +39,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     left join ChallengeUserResultEntity cur
         on cur.user.id = u.id
        and cur.id.challengeId = :challengeId
+    where u.isDeleted = false   
     order by
         case when cur.currentRankNo is null then 1 else 0 end asc,
         cur.currentRankNo asc,
