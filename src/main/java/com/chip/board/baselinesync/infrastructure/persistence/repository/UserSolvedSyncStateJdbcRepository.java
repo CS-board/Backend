@@ -52,6 +52,7 @@ public class UserSolvedSyncStateJdbcRepository implements SyncStateQueryPort, Sy
               AND s.baseline_ready = 0
               AND u.boj_id IS NOT NULL
               AND TRIM(u.boj_id) <> ''
+              AND u.is_deleted = 0
             LIMIT 1
             """;
 
@@ -118,6 +119,7 @@ public class UserSolvedSyncStateJdbcRepository implements SyncStateQueryPort, Sy
             AND u.boj_id IS NOT NULL
             AND TRIM(u.boj_id) <> ''
             AND (s.observed_at IS NULL OR s.observed_at < ?)
+            AND u.is_deleted = 0
         )
     """, Boolean.class, windowStart);
         return v != null && v;
@@ -135,6 +137,7 @@ public class UserSolvedSyncStateJdbcRepository implements SyncStateQueryPort, Sy
             AND s.observed_at IS NOT NULL
             AND s.observed_at >= ?
             AND s.last_solved_count < s.observed_solved_count
+            AND u.is_deleted = 0
         )
     """, Boolean.class, windowStart);
         return v != null && v;
@@ -187,6 +190,7 @@ public class UserSolvedSyncStateJdbcRepository implements SyncStateQueryPort, Sy
               AND (s.observed_at IS NULL OR s.observed_at < ?)
               AND u.boj_id IS NOT NULL
               AND u.boj_id <> ''
+              AND u.is_deleted = 0
             ORDER BY s.user_id ASC
             """;
 
@@ -202,6 +206,7 @@ public class UserSolvedSyncStateJdbcRepository implements SyncStateQueryPort, Sy
               AND (s.observed_at IS NULL OR s.observed_at < ?)
               AND u.boj_id IS NOT NULL
               AND u.boj_id <> ''
+              AND u.is_deleted = 0
             LIMIT 1
             """;
 
