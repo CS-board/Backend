@@ -66,7 +66,10 @@ public enum ErrorCode {
 
     // 개인 기록 조회
     INVALID_PAGE(HttpStatus.BAD_REQUEST, "INVALID_PAGE", "page 또는 size 값이 올바르지 않습니다."),
-    INVALID_GOAL_POINTS(HttpStatus.BAD_REQUEST, "INVALID_GOAL_POINTS","0 이상의 큰 값을 입력해주세요");
+    INVALID_GOAL_POINTS(HttpStatus.BAD_REQUEST, "INVALID_GOAL_POINTS","0 이상의 큰 값을 입력해주세요"),
+
+    // notice
+    BOARD_POST_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD_101", "존재하지 않는 게시글입니다.");
 
     private final HttpStatus status;
     private final String code;
