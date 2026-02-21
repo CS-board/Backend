@@ -4,6 +4,6 @@ import com.chip.board.notice.domain.BoardPost;
 
 public interface BoardPostCommandPort {
     Long save(BoardPost post);
-    void update(Long id, String title, String content, boolean pinned);
-    void delete(Long id);
+    void update(BoardPost post, String title, String content, boolean pinned);
+    void delete(BoardPost post);
 }

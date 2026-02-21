@@ -5,6 +5,7 @@ import com.chip.board.global.base.dto.ResponseUtils;
 import com.chip.board.notice.application.service.BoardPostService;
 import com.chip.board.notice.presentation.dto.response.BoardPostDetailResponse;
 import com.chip.board.notice.presentation.dto.response.BoardPostListResponse;
+import com.chip.board.notice.presentation.swagger.NoticeGetSwagger;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +13,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/board/posts")
+@Validated
 @RequiredArgsConstructor
-public class NoticeGetController {
+public class NoticeGetController implements NoticeGetSwagger {
 
     private final BoardPostService boardPostService;
 

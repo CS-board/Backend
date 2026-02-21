@@ -5,9 +5,11 @@ import com.chip.board.global.base.dto.ResponseUtils;
 import com.chip.board.notice.application.service.BoardPostService;
 import com.chip.board.notice.presentation.dto.request.CreateBoardPostRequest;
 import com.chip.board.notice.presentation.dto.request.UpdateBoardPostRequest;
+import com.chip.board.notice.presentation.swagger.AdminNoticePostSwagger;
 import com.chip.board.qnaboard.presentation.dto.response.question.IdResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +18,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin/board/posts")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-public class AdminNoticePostController {
+public class AdminNoticePostController implements AdminNoticePostSwagger {
 
     private final BoardPostService service;
 
     @PostMapping
     public ResponseEntity<ResponseBody<IdResponse>> create(@Valid @RequestBody CreateBoardPostRequest req) {
         Long id = service.create(req.title(), req.content(), req.pinned());
-        return ResponseEntity.ok(ResponseUtils.createSuccessResponse(new IdResponse(id)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseUtils.createSuccessResponse(new IdResponse(id)));
     }
 
     @PatchMapping("/{postId}")

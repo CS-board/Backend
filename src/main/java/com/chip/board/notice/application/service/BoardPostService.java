@@ -37,23 +37,24 @@ public class BoardPostService {
     }
 
     @Transactional
-    public Long create( String title, String content, boolean pinned) {
+    public Long create(String title, String content, boolean pinned) {
         BoardPost boardPost = new BoardPost(title, content, pinned);
         return commandPort.save(boardPost);
     }
 
     @Transactional
     public void update(Long postId, String title, String content, boolean pinned) {
-        queryPort.findById(postId)
+        BoardPost post = queryPort.findById(postId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.BOARD_POST_NOT_FOUND));
-        commandPort.update(postId, title, content, pinned);
+
+        commandPort.update(post, title, content, pinned);
     }
 
     @Transactional
     public void delete(Long postId) {
-        queryPort.findById(postId)
+        BoardPost post = queryPort.findById(postId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.BOARD_POST_NOT_FOUND));
 
-        commandPort.delete(postId);
+        commandPort.delete(post);
     }
 }

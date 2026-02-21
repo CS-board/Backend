@@ -34,17 +34,12 @@ public class BoardPostPersistenceAdapter implements BoardPostQueryPort, BoardPos
     }
 
     @Override
-    public void update(Long id, String title, String content, boolean pinned) {
-        BoardPost boardPost = boardPostJpaRepository.findById(id).orElseThrow();
-        boardPost.setTitle(title);
-        boardPost.setContent(content);
-        boardPost.setPinned(pinned);
-        boardPostJpaRepository.save(boardPost);
+    public void update(BoardPost post, String title, String content, boolean pinned) {
+        post.update(title, content, pinned); // dirty checking
     }
 
     @Override
-    public void delete(Long id) {
-        BoardPost boardPost = boardPostJpaRepository.findById(id).orElseThrow();
-        boardPostJpaRepository.delete(boardPost);
+    public void delete(BoardPost post) {
+        boardPostJpaRepository.delete(post); // @SQLDelete 적용
     }
 }
