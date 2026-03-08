@@ -15,8 +15,8 @@ public record SolvedAcRandomProblemsRequest(
         @Min(0) Integer minSolvedUserCount,
         @Min(0) Integer maxSolvedUserCount,
 
-        @NotBlank String tierFrom,
-        @NotBlank String tierTo,
+        @NotBlank @Pattern(regexp = "^[a-z0-9]+$", message = "tierFrom은 소문자/숫자 만 허용합니다.") String tierFrom,
+        @NotBlank @Pattern(regexp = "^[a-z0-9]+$", message = "tierTo는 소문자/숫자 만 허용합니다.") String tierTo,
 
         @NotNull SolvedFilter solvedFilter,
 

@@ -45,7 +45,6 @@ public class SecurityConfig {
             "/api/challenges/{challengeId}/info/**",
             "/api/challenges/{challengeId}/rankings",
             "/api/board/posts/**",
-            "/api/problems/**"
     };
 
     @Bean

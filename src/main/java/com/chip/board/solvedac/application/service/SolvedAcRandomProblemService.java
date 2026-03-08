@@ -45,10 +45,9 @@ public class SolvedAcRandomProblemService {
         }
 
         List<SolvedProblemItem> items = page.items();
-        int resultCount  = Math.min(req.limit(), items.size());
 
         List<SolvedAcRandomProblemsResponse.Item> responseItems  = items.stream()
-                .limit(resultCount )
+                .limit(req.limit())
                 .map(it -> new SolvedAcRandomProblemsResponse.Item(
                         it.problemId(),
                         it.level(),

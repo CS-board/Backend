@@ -6,6 +6,7 @@ import com.chip.board.global.jwt.annotation.CurrentUserId;
 import com.chip.board.solvedac.application.service.SolvedAcRandomProblemService;
 import com.chip.board.solvedac.presentation.dto.request.SolvedAcRandomProblemsRequest;
 import com.chip.board.solvedac.presentation.dto.response.SolvedAcRandomProblemsResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Validated
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
 @RequestMapping("/api/problems")
 public class RandomProblemController {
 
@@ -30,10 +32,7 @@ public class RandomProblemController {
             @CurrentUserId Long userId,
             @Valid @RequestBody SolvedAcRandomProblemsRequest req
     ) {
-        System.out.println(req);
         SolvedAcRandomProblemsResponse res = service.pick(userId, req);
-
-        System.out.println(res);
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(res));
     }
 }
