@@ -69,8 +69,11 @@ public enum ErrorCode {
     INVALID_GOAL_POINTS(HttpStatus.BAD_REQUEST, "INVALID_GOAL_POINTS","0 이상의 큰 값을 입력해주세요"),
 
     // notice
-    BOARD_POST_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD_101", "존재하지 않는 게시글입니다.");
+    BOARD_POST_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD_101", "존재하지 않는 게시글입니다."),
 
+    //randomProblem
+    USER_BOJ_ID_NOT_SET(HttpStatus.NOT_FOUND, "random_001", "bojId가 세팅되어 있지 않습니다."),
+    SOLVED_AC_UNAVAILABLE(HttpStatus.BAD_REQUEST, "random_002", "쿼리가 타당하지 않습니다.");
     private final HttpStatus status;
     private final String code;
     private final String message;
