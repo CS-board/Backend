@@ -66,7 +66,7 @@ public class RecommendationHistoryService {
         int evictedCount = 0;
         if (overflow > 0) {
             List<Long> oldestIds = savedProblemPort
-                    .findLatestByUserId(userId, PageRequest.of(0, overflow))
+                    .findOldestByUserId(userId, PageRequest.of(0, overflow))
                     .stream()
                     .map(SavedProblem::getId)
                     .toList();

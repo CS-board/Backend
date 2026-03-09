@@ -36,7 +36,7 @@ public interface ProblemSwagger {
             ),
             errors = {
                     @SwaggerApiFailedResponse(ErrorCode.USER_BOJ_ID_NOT_SET),
-                    @SwaggerApiFailedResponse(ErrorCode.SOLVEDAC_COOLDOWN_ACTIVE),
+                    @SwaggerApiFailedResponse(ErrorCode.SOLVED_AC_UNAVAILABLE),
                     @SwaggerApiFailedResponse(ErrorCode.USER_NOT_FOUND)
             }
     )

@@ -5,6 +5,9 @@ import com.chip.board.register.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -18,7 +21,7 @@ import lombok.NoArgsConstructor;
                 @Index(name = "idx_saved_problem_user_created", columnList = "user_id, created_at")
         }
 )
-public class SavedProblem extends BaseEntity {
+public class SavedProblem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +43,10 @@ public class SavedProblem extends BaseEntity {
 
     @Column(name = "level", nullable = false)
     private Integer level;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     public SavedProblem(User user, Integer problemId, String titleKo, Integer level) {
         this.user = user;
