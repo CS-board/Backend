@@ -17,11 +17,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 
 @Slf4j
 @RestController
-@Validated
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
 @RequestMapping("/api/problems")

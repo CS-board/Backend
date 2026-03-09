@@ -129,32 +129,26 @@ public class RecommendationHistoryService {
     }
 
     private RecommendationHistoryResponse.Item toHistoryItem(SavedProblem e) {
+        int level = (e.getLevel() == null) ? 0 : e.getLevel();
         return new RecommendationHistoryResponse.Item(
                 e.getId(),
                 e.getProblemId(),
                 e.getTitleKo(),
                 e.getLevel(),
-                tierCodeFromLevel(e.getLevel()),
+                TierMapper.toTierCode(level),
                 e.getCreatedAt()
         );
     }
 
     private SaveProblemsResponse.Item toSaveItem(SavedProblem e) {
+        int level = (e.getLevel() == null) ? 0 : e.getLevel();
         return new SaveProblemsResponse.Item(
                 e.getId(),
                 e.getProblemId(),
                 e.getTitleKo(),
                 e.getLevel(),
-                tierCodeFromLevel(e.getLevel()),
+                TierMapper.toTierCode(level),
                 e.getCreatedAt()
         );
-    }
-
-    private String tierCodeFromLevel(Integer level) {
-        if (level == null || level <= 0 || level > 30) return "unrated";
-        String[] groups = {"b", "s", "g", "p", "d", "r"};
-        int groupIdx = (level - 1) / 5;   // 0..5
-        int sub = 5 - ((level - 1) % 5);  // 5..1
-        return groups[groupIdx] + sub;
     }
 }
