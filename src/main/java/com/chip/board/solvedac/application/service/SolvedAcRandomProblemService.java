@@ -48,12 +48,15 @@ public class SolvedAcRandomProblemService {
 
         List<SolvedAcRandomProblemsResponse.Item> responseItems  = items.stream()
                 .limit(req.limit())
-                .map(it -> new SolvedAcRandomProblemsResponse.Item(
-                        it.problemId(),
-                        it.level(),
-                        TierMapper.toTierCode(it.level()),
-                        it.titleKo()
-                ))
+                .map(it -> {
+                    int level = it.level() == null ? 0 : it.level();
+                    return new SolvedAcRandomProblemsResponse.Item(
+                            it.problemId(),
+                            level,
+                            TierMapper.toTierCode(level),
+                            it.titleKo()
+                    );
+                })
                 .toList();
 
         return new SolvedAcRandomProblemsResponse(query, responseItems );
