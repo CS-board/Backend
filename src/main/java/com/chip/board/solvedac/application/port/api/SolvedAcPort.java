@@ -14,4 +14,6 @@ public interface SolvedAcPort {
 
     SolvedProblemPage fetchSolvedProblemPageWithCountOrNull(String handle, int page);
 
+    SolvedProblemPage searchProblemPageWithCountOrNull(String query, int page, String sort, String direction);
+
 }

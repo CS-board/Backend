@@ -214,6 +214,57 @@ public class SolvedAcClient implements SolvedAcPort {
         return new SolvedProblemPage(total, mapped);
     }
 
+    @Override
+    public SolvedProblemPage searchProblemPageWithCountOrNull(String query, int page, String sort, String direction) {
+        long now = System.currentTimeMillis();
+        if (now < nextAllowedAtMs()) return null;
+
+        try {
+            SolvedAcSearchProblemResponse r = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/search/problem")
+                            .queryParam("query", query)
+                            .queryParam("page", page)
+                            .queryParam("sort", sort)
+                            .queryParam("direction", direction)
+                            .build())
+                    .retrieve()
+                    .body(SolvedAcSearchProblemResponse.class);
+
+            afterOk(now);
+            if (r == null) return null;
+
+            int total = (r.count() == null) ? 0 : r.count();
+
+            var raw = (r.items() == null) ? java.util.List.<SolvedAcSearchProblemResponse.Item>of() : r.items();
+
+            var mapped = raw.stream()
+                    .filter(it -> it.problemId() != null)
+                    .filter(it -> it.level() != null)
+                    .map(it -> new SolvedProblemItem(
+                            it.problemId(), it.level(), it.titleKo()
+                    ))
+                    .toList();
+
+            return new SolvedProblemPage(total, mapped);
+
+        } catch (HttpClientErrorException e) {
+            int code = e.getStatusCode().value();
+            if (code == 429) after429(now); else afterOk(now);
+            return null;
+
+        } catch (HttpServerErrorException | ResourceAccessException e) {
+            // 5xx or I/O(네트워크) 계열
+            afterTransient(now);
+            return null;
+
+        } catch (RuntimeException e) {
+            // 나머지 예상 못 한 런타임 예외
+            afterTransient(now);
+            return null;
+        }
+    }
+
     private void record429Cooldown() {
         LocalDateTime now = LocalDateTime.now(clock);
         externalApiCooldownPort.upsert429Cooldown(API_KEY_SOLVED_AC, now);
