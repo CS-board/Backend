@@ -3,8 +3,8 @@ package com.chip.board.solvedac.application.service;
 import com.chip.board.baselinesync.infrastructure.persistence.dto.SolvedProblemItem;
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
+import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.domain.User;
-import com.chip.board.register.infrastructure.persistence.repository.UserRepository;
 import com.chip.board.solvedac.application.port.api.SolvedAcPort;
 import com.chip.board.solvedac.infrastructure.api.dto.response.SolvedProblemPage;
 import com.chip.board.solvedac.presentation.dto.request.SolvedAcRandomProblemsRequest;
@@ -19,7 +19,7 @@ import java.util.List;
 public class SolvedAcRandomProblemService {
 
     private final SolvedAcPort solvedAcPort;
-    private final UserRepository userRepository;
+    private final UserRepositoryPort userRepositoryPort;
 
     public SolvedAcRandomProblemsResponse pick(Long userId, SolvedAcRandomProblemsRequest req) {
         String handle = null;
@@ -63,7 +63,7 @@ public class SolvedAcRandomProblemService {
     }
 
     private String findBojHandleByUserIdOrThrow(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
         String bojId = user.getBojId();
