@@ -2,9 +2,10 @@ package com.chip.board.me.application.service;
 
 import com.chip.board.global.base.exception.ServiceException;
 import com.chip.board.global.base.exception.ErrorCode;
-import com.chip.board.me.presentation.dto.response.MyProfileResponse;
+import com.chip.board.me.presentation.dto.response.ProfileDetailResponse;
 import com.chip.board.me.presentation.dto.response.UpdateDepartmentResponse;
 import com.chip.board.me.presentation.dto.response.UpdateGradeResponse;
+import com.chip.board.me.presentation.dto.response.ProfileResponse;
 import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.domain.Department;
 import com.chip.board.register.domain.User;
@@ -19,11 +20,11 @@ public class UserProfileService {
 
     private final UserRepositoryPort userRepositoryPort;
 
-    public MyProfileResponse getMyProfile(Long userId) {
+    public ProfileDetailResponse getMyProfileDetail(Long userId) {
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
-        return new MyProfileResponse(
+        return new ProfileDetailResponse(
                 user.getName(),
                 user.getStudentId(),
                 user.getDepartment(),
@@ -58,5 +59,15 @@ public class UserProfileService {
         userRepositoryPort.save(user);
 
         return new UpdateGradeResponse(user.getGrade());
+    }
+
+    public ProfileResponse getMyProfile(Long userId) {
+        User user = userRepositoryPort.findById(userId)
+                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+
+        return new ProfileResponse(
+                user.getName(),
+                user.getDepartment()
+        );
     }
 }

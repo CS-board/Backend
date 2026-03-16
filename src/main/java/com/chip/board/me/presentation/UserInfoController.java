@@ -8,9 +8,10 @@ import com.chip.board.me.application.service.UserProfileService;
 import com.chip.board.me.presentation.dto.request.UpdateDepartmentRequest;
 import com.chip.board.me.presentation.dto.request.UpdateGoalPointsRequest;
 import com.chip.board.me.presentation.dto.request.UpdateGradeRequest;
-import com.chip.board.me.presentation.dto.response.MyProfileResponse;
+import com.chip.board.me.presentation.dto.response.ProfileDetailResponse;
 import com.chip.board.me.presentation.dto.response.UpdateDepartmentResponse;
 import com.chip.board.me.presentation.dto.response.UpdateGradeResponse;
+import com.chip.board.me.presentation.dto.response.ProfileResponse;
 import com.chip.board.me.presentation.swagger.UserInfoSwagger;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +37,19 @@ public class UserInfoController implements UserInfoSwagger {
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(null));
     }
 
-    @GetMapping
-    public ResponseEntity<ResponseBody<MyProfileResponse>> getMyProfile(
+    @GetMapping("/detail")
+    public ResponseEntity<ResponseBody<ProfileDetailResponse>> getMyProfileDetail(
             @CurrentUserId Long userId
     ) {
-        MyProfileResponse response = userProfileService.getMyProfile(userId);
+        ProfileDetailResponse response = userProfileService.getMyProfileDetail(userId);
+        return ResponseEntity.ok(ResponseUtils.createSuccessResponse(response));
+    }
+
+    @GetMapping
+    public ResponseEntity<ResponseBody<ProfileResponse>> getMyProfile(
+            @CurrentUserId Long userId
+    ) {
+        ProfileResponse response = userProfileService.getMyProfile(userId);
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(response));
     }
 
@@ -65,4 +74,6 @@ public class UserInfoController implements UserInfoSwagger {
 
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(response));
     }
+
+
 }

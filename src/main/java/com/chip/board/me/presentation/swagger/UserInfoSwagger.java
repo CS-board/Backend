@@ -8,7 +8,8 @@ import com.chip.board.global.config.swagger.SwaggerApiSuccessResponse;
 import com.chip.board.me.presentation.dto.request.UpdateDepartmentRequest;
 import com.chip.board.me.presentation.dto.request.UpdateGoalPointsRequest;
 import com.chip.board.me.presentation.dto.request.UpdateGradeRequest;
-import com.chip.board.me.presentation.dto.response.MyProfileResponse;
+import com.chip.board.me.presentation.dto.response.ProfileDetailResponse;
+import com.chip.board.me.presentation.dto.response.ProfileResponse;
 import com.chip.board.me.presentation.dto.response.UpdateDepartmentResponse;
 import com.chip.board.me.presentation.dto.response.UpdateGradeResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,13 +53,33 @@ public interface UserInfoSwagger {
     );
 
     @Operation(
-            summary = "내 프로필 조회",
+            summary = "내 프로필 상세 조회",
+            description = "로그인한 사용자의 프로필 상세 정보를 조회합니다."
+    )
+    @SwaggerApiResponses(
+            success = @SwaggerApiSuccessResponse(
+                    status = HttpStatus.OK,
+                    response = ProfileDetailResponse.class,
+                    description = "내 프로필 조회 성공"
+            ),
+            errors = {
+                    @SwaggerApiFailedResponse(ErrorCode.USER_NOT_FOUND)
+            }
+    )
+    @GetMapping("/detail")
+    ResponseEntity<ResponseBody<ProfileDetailResponse>> getMyProfileDetail(
+            @Parameter(hidden = true)
+            Long userId
+    );
+
+    @Operation(
+            summary = "내 프로필 조회(이름, 학과)",
             description = "로그인한 사용자의 프로필 정보를 조회합니다."
     )
     @SwaggerApiResponses(
             success = @SwaggerApiSuccessResponse(
                     status = HttpStatus.OK,
-                    response = MyProfileResponse.class,
+                    response = ProfileResponse.class,
                     description = "내 프로필 조회 성공"
             ),
             errors = {
@@ -66,10 +87,12 @@ public interface UserInfoSwagger {
             }
     )
     @GetMapping
-    ResponseEntity<ResponseBody<MyProfileResponse>> getMyProfile(
+    ResponseEntity<ResponseBody<ProfileResponse>> getMyProfile(
             @Parameter(hidden = true)
             Long userId
     );
+
+
 
     @Operation(
             summary = "내 학과 변경",

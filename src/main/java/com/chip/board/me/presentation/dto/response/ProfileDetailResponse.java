@@ -1,6 +1,6 @@
 package com.chip.board.me.presentation.dto.response;
 
-public record MyProfileResponse(
+public record ProfileDetailResponse(
         String name,
         String studentId,
         String department,
