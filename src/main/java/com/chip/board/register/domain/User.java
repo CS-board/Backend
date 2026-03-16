@@ -112,7 +112,7 @@ public class User {
 
     public void changeGrade(int grade) {
         if (grade < 1 || grade > 5) {
-            throw new IllegalArgumentException("grade must be between 1 and 6");
+            throw new IllegalArgumentException("grade must be between 1 and 5");
         }
         this.grade = grade;
     }

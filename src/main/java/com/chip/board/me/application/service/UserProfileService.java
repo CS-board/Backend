@@ -39,10 +39,6 @@ public class UserProfileService {
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
-        if (department == null || department.isBlank()) {
-            throw new ServiceException(ErrorCode.INVALID_DEPARTMENT);
-        }
-
         user.changeDepartment(Department.fromDisplayName(department).getDisplayName());
         userRepositoryPort.save(user);
 
