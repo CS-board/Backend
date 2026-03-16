@@ -65,9 +65,9 @@ public class UserProfileService {
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
-        return ProfileResponse.builder()
-                .name(user.getName())
-                .department(user.getDepartment())
-                .build();
+        return new ProfileResponse(
+                user.getName(),
+                user.getDepartment()
+        );
     }
 }
