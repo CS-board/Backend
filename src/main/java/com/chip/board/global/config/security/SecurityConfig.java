@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 @EnableMethodSecurity
 @RequiredArgsConstructor
@@ -45,8 +46,7 @@ public class SecurityConfig {
             "/api/challenges/*/info/**",
             "/api/challenges/*/rankings",
             "/api/board/posts/**",
-            "/api/qna/questions",
-            "/api/qna/questions/*"
+            "/api/board/posts/**"
     };
 
     @Bean
@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .requestMatchers(ACTUATOR_WHITELIST).permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers(PUBLIC_WHITELIST).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/qna/questions", "/api/qna/questions/*").permitAll()
                         .anyRequest().authenticated()
                 )
 
