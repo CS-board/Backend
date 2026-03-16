@@ -10,8 +10,12 @@ import com.chip.board.qnaboard.presentation.dto.response.question.QuestionListRe
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "QnA Question Query", description = "QnA 질문 조회 API")
 public interface QnaQuestionQuerySwagger {
@@ -26,10 +30,13 @@ public interface QnaQuestionQuerySwagger {
                     description = "질문 목록 조회 성공"
             ),
             errors = {
-                    //없음
+                    // 없음
             }
     )
-    ResponseEntity<ResponseBody<QuestionListResponse>> list(int page, int size);
+    ResponseEntity<ResponseBody<QuestionListResponse>> list(
+            @Parameter(description = "페이지(0부터)") @RequestParam(defaultValue = "0") @Min(0) int page,
+            @Parameter(description = "페이지 크기(1~100)") @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size
+    );
 
     @Operation(summary = "질문 상세 조회", description = "질문 상세 정보를 조회합니다.")
     @Parameter(name = "id", description = "질문 ID", required = true)
@@ -43,5 +50,5 @@ public interface QnaQuestionQuerySwagger {
                     @SwaggerApiFailedResponse(ErrorCode.QNA_QUESTION_NOT_FOUND),
             }
     )
-    ResponseEntity<ResponseBody<QuestionDetailResponse>> detail(long id);
+    ResponseEntity<ResponseBody<QuestionDetailResponse>> detail(@Parameter(description = "질문 ID") @PathVariable long id);
 }
