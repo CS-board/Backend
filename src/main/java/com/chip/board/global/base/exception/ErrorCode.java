@@ -42,6 +42,7 @@ public enum ErrorCode {
     DUPLICATE_BOJ_ID(CONFLICT, "USER_013", "이미 등록된 BOJ 아이디입니다."),
     DUPLICATE_STUDENT_ID(CONFLICT, "USER_014", "이미 등록된 학번입니다."),
     DUPLICATE_PHONE_NUMBER(CONFLICT, "USER_015", "이미 등록된 전화번호입니다."),
+    INVALID_USER_GRADE(HttpStatus.BAD_REQUEST, "USER_016", "학년 입력값이 올바르지 않습니다."),
 
 
     //Sync

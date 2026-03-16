@@ -4,23 +4,28 @@ import com.chip.board.global.base.dto.ResponseBody;
 import com.chip.board.global.base.dto.ResponseUtils;
 import com.chip.board.global.jwt.annotation.CurrentUserId;
 import com.chip.board.me.application.service.UserGoalService;
+import com.chip.board.me.application.service.UserProfileService;
+import com.chip.board.me.presentation.dto.request.UpdateDepartmentRequest;
 import com.chip.board.me.presentation.dto.request.UpdateGoalPointsRequest;
+import com.chip.board.me.presentation.dto.request.UpdateGradeRequest;
+import com.chip.board.me.presentation.dto.response.MyProfileResponse;
+import com.chip.board.me.presentation.dto.response.UpdateDepartmentResponse;
+import com.chip.board.me.presentation.dto.response.UpdateGradeResponse;
 import com.chip.board.me.presentation.swagger.UserInfoSwagger;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
 @RestController
 @RequestMapping("/api/users/me")
 @RequiredArgsConstructor
 public class UserInfoController implements UserInfoSwagger {
+
     private final UserGoalService userGoalService;
+    private final UserProfileService userProfileService;
 
     @PatchMapping("/goal-points")
     public ResponseEntity<ResponseBody<Void>> updateGoalPoints(
@@ -29,5 +34,35 @@ public class UserInfoController implements UserInfoSwagger {
     ) {
         userGoalService.updateMyGoalPoints(userId, req.goalPoints());
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(null));
+    }
+
+    @GetMapping
+    public ResponseEntity<ResponseBody<MyProfileResponse>> getMyProfile(
+            @CurrentUserId Long userId
+    ) {
+        MyProfileResponse response = userProfileService.getMyProfile(userId);
+        return ResponseEntity.ok(ResponseUtils.createSuccessResponse(response));
+    }
+
+    @PatchMapping("/department")
+    public ResponseEntity<ResponseBody<UpdateDepartmentResponse>> updateDepartment(
+            @CurrentUserId Long userId,
+            @Valid @RequestBody UpdateDepartmentRequest request
+    ) {
+        UpdateDepartmentResponse response =
+                userProfileService.updateDepartment(userId, request.department());
+
+        return ResponseEntity.ok(ResponseUtils.createSuccessResponse(response));
+    }
+
+    @PatchMapping("/grade")
+    public ResponseEntity<ResponseBody<UpdateGradeResponse>> updateGrade(
+            @CurrentUserId Long userId,
+            @Valid @RequestBody UpdateGradeRequest request
+    ) {
+        UpdateGradeResponse response =
+                userProfileService.updateGrade(userId, request.grade());
+
+        return ResponseEntity.ok(ResponseUtils.createSuccessResponse(response));
     }
 }
