@@ -29,7 +29,7 @@ public class ChallengeSyncScheduler {
             return;
         }
 
-        LocalDateTime windowStart = LocalDate.now(clock).atTime(0, 2, 0);
+        LocalDateTime windowStart = LocalDate.now(clock).atTime(syncStart);
         challengeSyncService.tickOnce(windowStart); // tick 1회당 API 최대 1번
     }
 }
