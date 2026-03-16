@@ -102,4 +102,18 @@ public class User {
         if (goalPoints < 0) throw new IllegalArgumentException("goalPoints must be >= 0");
         this.goalPoints = goalPoints;
     }
+
+    public void changeDepartment(String department) {
+        if (department == null || department.isBlank()) {
+            throw new IllegalArgumentException("department must not be blank");
+        }
+        this.department = department;
+    }
+
+    public void changeGrade(int grade) {
+        if (grade < 1 || grade > 5) {
+            throw new IllegalArgumentException("grade must be between 1 and 5");
+        }
+        this.grade = grade;
+    }
 }
