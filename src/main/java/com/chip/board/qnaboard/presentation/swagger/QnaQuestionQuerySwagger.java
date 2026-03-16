@@ -34,8 +34,8 @@ public interface QnaQuestionQuerySwagger {
             }
     )
     ResponseEntity<ResponseBody<QuestionListResponse>> list(
-            @RequestParam(defaultValue = "0") @Min(0) int page,
-            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size
+            @Parameter(description = "페이지(0부터)") @RequestParam(defaultValue = "0") @Min(0) int page,
+            @Parameter(description = "페이지 크기(1~100)") @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size
     );
 
     @Operation(summary = "질문 상세 조회", description = "질문 상세 정보를 조회합니다.")
@@ -50,5 +50,5 @@ public interface QnaQuestionQuerySwagger {
                     @SwaggerApiFailedResponse(ErrorCode.QNA_QUESTION_NOT_FOUND),
             }
     )
-    ResponseEntity<ResponseBody<QuestionDetailResponse>> detail(@PathVariable long id);
+    ResponseEntity<ResponseBody<QuestionDetailResponse>> detail(@Parameter(description = "질문 ID") @PathVariable long id);
 }
