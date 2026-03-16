@@ -17,19 +17,19 @@ public class ChallengeSyncScheduler {
     private final ChallengeSyncService challengeSyncService;
     private final Clock clock;
 
-    // 00:01 ~ 02:59 동안만 돌리고, 그 외 시간엔 즉시 return
+    // 00:02 ~ 02:59 동안만 돌리고, 그 외 시간엔 즉시 return
     @Scheduled(fixedDelay = 5000, initialDelay = 1000)
     public void tick() {
         LocalTime now = LocalTime.now(clock);
 
-        final LocalTime syncStart = LocalTime.of(19, 1);
-        final LocalTime syncEnd = LocalTime.of(23, 0);
-        // 00:01 <= now < 03:00
+        final LocalTime syncStart = LocalTime.of(0, 2);
+        final LocalTime syncEnd = LocalTime.of(3, 0);
+        // 00:02 <= now < 03:00
         if (now.isBefore(syncStart) || !now.isBefore(syncEnd)) {
             return;
         }
 
-        LocalDateTime windowStart = LocalDate.now(clock).atTime(19, 1, 0);
+        LocalDateTime windowStart = LocalDate.now(clock).atTime(0, 2, 0);
         challengeSyncService.tickOnce(windowStart); // tick 1회당 API 최대 1번
     }
 }
