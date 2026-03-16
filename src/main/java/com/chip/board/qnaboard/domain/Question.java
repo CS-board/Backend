@@ -1,11 +1,10 @@
 package com.chip.board.qnaboard.domain;
 
+import com.chip.board.global.config.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -18,7 +17,7 @@ import java.time.LocalDateTime;
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Question {
+public class Question extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,12 +41,6 @@ public class Question {
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
     public Question(String title, String content, Long authorId, String authorName) {
         this.title = title;
         this.content = content;
@@ -55,19 +48,8 @@ public class Question {
         this.authorName = authorName;
     }
 
-    @PrePersist
-    void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-    }
-
-    @PreUpdate
-    void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
     public void markSolved(boolean solved) { this.solved = solved; }
+
     public void softDelete() { this.deleted = true; }
 
     public void change(String title, String content) {

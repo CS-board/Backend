@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
         uniqueConstraints = @UniqueConstraint(name = "uk_qna_like", columnNames = {"question_id", "user_id"}),
         indexes = @Index(name = "idx_qna_like_question", columnList = "question_id")
 )
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class QuestionLike {
 
@@ -26,6 +29,7 @@ public class QuestionLike {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -33,7 +37,4 @@ public class QuestionLike {
         this.questionId = questionId;
         this.userId = userId;
     }
-
-    @PrePersist
-    void prePersist() { this.createdAt = LocalDateTime.now(); }
 }
