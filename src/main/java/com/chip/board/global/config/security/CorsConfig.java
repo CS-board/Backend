@@ -1,6 +1,7 @@
 package com.chip.board.global.config.security;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -11,10 +12,12 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties({ CorsProperties.class })
 public class CorsConfig {
+
+    @Bean
     public static CorsConfigurationSource corsConfigurationSource(CorsProperties corsProperties) {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(corsProperties.getOrigins());
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setMaxAge(3600L);
         configuration.setAllowCredentials(true);
