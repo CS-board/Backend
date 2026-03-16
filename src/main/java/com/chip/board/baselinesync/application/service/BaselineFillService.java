@@ -32,23 +32,25 @@ public class BaselineFillService {
 
     /** 스케줄러에서 자주 호출해도 됨(전역 gate에서 대부분 return) */
     public void tickOnce() {
-        if (solvedAcPort.isCooldownActive()) return;
-        log.info("tickOnce skipped by cooldown");
+        if (solvedAcPort.isCooldownActive()) {
+            log.debug("tickOnce skipped by cooldown");
+            return;
+        }
 
         long now = System.currentTimeMillis();
 
         Optional<Long> userIdOpt = jobQueuePort.popDueUserId(now);
-        log.info("tickOnce popDueUserId now={}, userIdOpt={}", now, userIdOpt);
+        log.debug("tickOnce popDueUserId now={}, userIdOpt={}", now, userIdOpt);
 
         if (userIdOpt.isEmpty()) return;
 
         long userId = userIdOpt.get();
-        log.info("tickOnce processing userId={}", userId);
+        log.debug("tickOnce processing userId={}", userId);
 
 
         Optional<BaselineTarget> targetOpt =
                 tx.execute(st -> syncStateQueryPort.findBaselineTarget(userId));
-        log.info("tickOnce targetOpt={}", targetOpt);
+        log.debug("tickOnce targetOpt={}", targetOpt);
 
         if (targetOpt == null || targetOpt.isEmpty()) return;
 
@@ -56,7 +58,7 @@ public class BaselineFillService {
         String handle = target.bojHandle();
         int nextPage = target.nextPage();
 
-        log.info("tickOnce handle={}, nextPage={}", handle, nextPage);
+        log.debug("tickOnce handle={}, nextPage={}", handle, nextPage);
 
 
         if (handle == null || handle.isBlank()) {
@@ -66,7 +68,7 @@ public class BaselineFillService {
 
         // ✅ tick당 API 호출 1회 (count + items)
         SolvedProblemPage page = solvedAcPort.fetchSolvedProblemPageWithCountOrNull(handle, nextPage);
-        log.info("tickOnce fetched page isNull={}", page == null);
+        log.debug("tickOnce fetched page isNull={}", page == null);
 
         if (page == null) {
             jobQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());

@@ -20,11 +20,11 @@ public class BaselineFillScheduler {
     @Scheduled(fixedDelay = 500, initialDelay = 1000)
     public void tick() {
         LocalTime now = LocalTime.now(clock);
-        log.info("scheduler tick now={}", now);
+        log.debug("scheduler tick now={}", now);
 
         // 06:00 <= now < 23:00
         if (now.isBefore(LocalTime.of(6, 0)) || !now.isBefore(LocalTime.of(23, 0))) {
-            log.info("scheduler skipped by time gate now={}", now);
+            log.debug("scheduler skipped by time gate now={}", now);
             return;
         }
 
