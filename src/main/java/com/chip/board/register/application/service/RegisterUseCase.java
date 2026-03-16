@@ -11,12 +11,14 @@ import com.chip.board.register.domain.Department;
 import com.chip.board.register.domain.Role;
 import com.chip.board.register.domain.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionSynchronization;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegisterUseCase {
@@ -47,6 +49,7 @@ public class RegisterUseCase {
 
         userRepositoryPort.save(user);
         userSolvedSyncPort.createInitialSyncState(user);
+        log.info("afterCommit enqueue userId={}", user.getId());
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
