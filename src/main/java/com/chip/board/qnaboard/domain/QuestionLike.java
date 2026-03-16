@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +28,7 @@ public class QuestionLike {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -33,7 +36,4 @@ public class QuestionLike {
         this.questionId = questionId;
         this.userId = userId;
     }
-
-    @PrePersist
-    void prePersist() { this.createdAt = LocalDateTime.now(); }
 }
