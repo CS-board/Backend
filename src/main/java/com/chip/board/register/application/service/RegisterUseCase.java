@@ -35,6 +35,18 @@ public class RegisterUseCase {
             throw new ServiceException(ErrorCode.EMAIL_NOT_VERIFIED);
         }
 
+        if (userRepositoryPort.findActiveByUsername(cmd.username()).isPresent()) {
+            throw new ServiceException(ErrorCode.USER_ALREADY_EXIST);
+        }
+
+        if (userRepositoryPort.existsActiveByBojId(cmd.bojId())) {
+            throw new ServiceException(ErrorCode.DUPLICATE_BOJ_ID);
+        }
+
+        if (userRepositoryPort.existsActiveByStudentId(cmd.studentId())) {
+            throw new ServiceException(ErrorCode.USER_ALREADY_EXIST);
+        }
+
         Department dept = Department.fromDisplayName(cmd.department());
         User user = User.builder()
                 .username(cmd.username())
@@ -49,7 +61,6 @@ public class RegisterUseCase {
 
         userRepositoryPort.save(user);
         userSolvedSyncPort.createInitialSyncState(user);
-        log.info("afterCommit enqueue userId={}", user.getId());
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {

@@ -8,19 +8,18 @@ import com.chip.board.global.config.swagger.SwaggerApiSuccessResponse;
 import com.chip.board.me.presentation.dto.request.UpdateDepartmentRequest;
 import com.chip.board.me.presentation.dto.request.UpdateGoalPointsRequest;
 import com.chip.board.me.presentation.dto.request.UpdateGradeRequest;
-import com.chip.board.me.presentation.dto.response.ProfileDetailResponse;
-import com.chip.board.me.presentation.dto.response.ProfileResponse;
-import com.chip.board.me.presentation.dto.response.UpdateDepartmentResponse;
-import com.chip.board.me.presentation.dto.response.UpdateGradeResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.ProfileDetailResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.ProfileResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.UpdateDepartmentResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.UpdateGradeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Me User", description = "내 사용자 정보 API")
 public interface UserInfoSwagger {
@@ -140,5 +139,37 @@ public interface UserInfoSwagger {
 
             @Parameter(description = "학년 변경 요청", required = true)
             @Valid @RequestBody UpdateGradeRequest request
+    );
+
+    @Operation(
+            summary = "회원 탈퇴",
+            description = """
+                로그인한 사용자를 탈퇴 처리합니다.
+                - refresh_token 쿠키가 있으면 해당 RT를 삭제(무효화)합니다.
+                - refresh_token 쿠키가 없어도 탈퇴는 진행될 수 있습니다(서버 정책에 따름).
+                """
+    )
+    @SwaggerApiResponses(
+            success = @SwaggerApiSuccessResponse(
+                    status = HttpStatus.OK,
+                    response = Void.class,
+                    description = "회원 탈퇴 성공"
+            ),
+            errors = {
+                    @SwaggerApiFailedResponse(ErrorCode.USER_NOT_FOUND)
+            }
+    )
+    @DeleteMapping
+    ResponseEntity<ResponseBody<Void>> withdraw(
+            @Parameter(hidden = true)
+            Long userId,
+
+            @Parameter(
+                    name = "refresh_token",
+                    description = "리프레시 토큰 쿠키(없어도 요청 가능)",
+                    required = false,
+                    in = ParameterIn.COOKIE
+            )
+            @CookieValue(name = "refresh_token", required = false) String refreshToken
     );
 }

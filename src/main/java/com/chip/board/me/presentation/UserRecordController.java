@@ -5,11 +5,11 @@ import com.chip.board.global.base.dto.ResponseUtils;
 import com.chip.board.global.jwt.annotation.CurrentUserId;
 import com.chip.board.me.application.service.DailySolvedProblemQueryService;
 import com.chip.board.me.application.service.MyRecordQueryService;
-import com.chip.board.me.presentation.dto.response.DailySolvedProblemsResponse;
-import com.chip.board.me.presentation.dto.response.MyChallengeSummaryResponse;
-import com.chip.board.me.presentation.dto.response.MyRecordSummaryResponse;
-import com.chip.board.me.presentation.dto.response.MyRecordWeeksResponse;
-import com.chip.board.me.presentation.swagger.MeSwagger;
+import com.chip.board.me.presentation.dto.response.UserRecord.DailySolvedProblemsResponse;
+import com.chip.board.me.presentation.dto.response.UserRecord.MyChallengeSummaryResponse;
+import com.chip.board.me.presentation.dto.response.UserRecord.MyRecordSummaryResponse;
+import com.chip.board.me.presentation.dto.response.UserRecord.MyRecordWeeksResponse;
+import com.chip.board.me.presentation.swagger.UserRecordSwagger;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +27,7 @@ import java.time.LocalDate;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/me/records")
-public class MeController implements MeSwagger {
+public class UserRecordController implements UserRecordSwagger {
 
     private final DailySolvedProblemQueryService dailySolvedProblemQueryService;
     private final MyRecordQueryService myRecordQueryService;

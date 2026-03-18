@@ -4,6 +4,7 @@ import com.chip.board.challenge.presentation.dto.request.ChallengeCreateRequest;
 import com.chip.board.challenge.presentation.dto.response.ChallengeInfoResponse;
 import com.chip.board.challenge.application.service.ChallengeCommandService;
 import com.chip.board.challenge.presentation.dto.response.ChallengeDetailInfoResponse;
+import com.chip.board.challenge.presentation.dto.response.ChallengeListItemResponse;
 import com.chip.board.challenge.presentation.swagger.ChallengeSwagger;
 import com.chip.board.global.base.dto.ResponseBody;
 import com.chip.board.global.base.dto.ResponseUtils;
@@ -13,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,15 +31,13 @@ public class ChallengeController implements ChallengeSwagger {
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse( challengeCommandService.hold(request)));
     }
 
-    @GetMapping("/{challengeId}/info/summary")
-    public ResponseEntity<ResponseBody<ChallengeInfoResponse>> info(
-            @PathVariable("challengeId") Long challengeId
-    ) {
-        ChallengeInfoResponse data = challengeCommandService.getInfo(challengeId);
+    @GetMapping
+    public ResponseEntity<ResponseBody<List<ChallengeListItemResponse>>> getChallenges() {
+        List<ChallengeListItemResponse> data = challengeCommandService.getChallengeList();
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(data));
     }
 
-    @GetMapping("/{challengeId}/info/details")
+    @GetMapping("/{challengeId}/details")
     public ResponseEntity<ResponseBody<ChallengeDetailInfoResponse>> detailInfo(
             @PathVariable("challengeId") Long challengeId
     ) {

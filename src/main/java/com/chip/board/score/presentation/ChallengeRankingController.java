@@ -24,6 +24,10 @@ public class ChallengeRankingController implements ChallengeRankingSwagger {
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "8") @Min(1) @Max(100) int size
     ) {
-        return ResponseEntity.ok(ResponseUtils.createSuccessResponse(challengeRankingQueryService.getRankingsAllUsers(challengeId, page, size)));
+        return ResponseEntity.ok(
+                ResponseUtils.createSuccessResponse(
+                        challengeRankingQueryService.getRankingsAllUsers(challengeId, page, size)
+                )
+        );
     }
 }

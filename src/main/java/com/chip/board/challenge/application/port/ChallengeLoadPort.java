@@ -5,6 +5,7 @@ import com.chip.board.challenge.domain.Challenge;
 import com.chip.board.syncproblem.application.port.dto.ChallengeSyncSnapshot;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface ChallengeLoadPort {
@@ -18,6 +19,8 @@ public interface ChallengeLoadPort {
     boolean existsActive();
     boolean existsClosedUnfinalized();
     Optional<ChallengeSyncSnapshot> findCurrentSyncTarget();
+
+    List<Challenge> findAllByOrderByStartAtDesc();
 
     ChallengeRankingAggregate getRankingAggregate(Long challengeId);
 }

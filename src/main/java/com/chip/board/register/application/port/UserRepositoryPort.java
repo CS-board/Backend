@@ -9,15 +9,17 @@ import java.util.Optional;
 
 public interface UserRepositoryPort {
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findActiveByUsername(String username);
 
     Optional<User> findById(Long id);
 
-    boolean existsByBojId(String bojId);
+    boolean existsActiveByBojId(String bojId);
 
     User save(User user);
 
     Page<ChallengeRankingRow> findRankingsAllUsers(Long challengeId, Pageable pageable);
 
     long countByDeletedFalse();
+
+    boolean existsActiveByStudentId(String studentId);
 }

@@ -5,13 +5,14 @@ import com.chip.board.global.base.dto.ResponseUtils;
 import com.chip.board.global.jwt.annotation.CurrentUserId;
 import com.chip.board.me.application.service.UserGoalService;
 import com.chip.board.me.application.service.UserProfileService;
+import com.chip.board.me.application.service.UserWithdrawalService;
 import com.chip.board.me.presentation.dto.request.UpdateDepartmentRequest;
 import com.chip.board.me.presentation.dto.request.UpdateGoalPointsRequest;
 import com.chip.board.me.presentation.dto.request.UpdateGradeRequest;
-import com.chip.board.me.presentation.dto.response.ProfileDetailResponse;
-import com.chip.board.me.presentation.dto.response.UpdateDepartmentResponse;
-import com.chip.board.me.presentation.dto.response.UpdateGradeResponse;
-import com.chip.board.me.presentation.dto.response.ProfileResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.ProfileDetailResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.UpdateDepartmentResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.UpdateGradeResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.ProfileResponse;
 import com.chip.board.me.presentation.swagger.UserInfoSwagger;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class UserInfoController implements UserInfoSwagger {
 
     private final UserGoalService userGoalService;
     private final UserProfileService userProfileService;
+    private final UserWithdrawalService userWithdrawalService;
 
     @PatchMapping("/goal-points")
     public ResponseEntity<ResponseBody<Void>> updateGoalPoints(
@@ -75,5 +77,12 @@ public class UserInfoController implements UserInfoSwagger {
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(response));
     }
 
-
+    @DeleteMapping
+    public ResponseEntity<ResponseBody<Void>> withdraw(
+            @CurrentUserId Long userId,
+            @CookieValue(name = "refresh_token", required = false) String refreshToken
+    ) {
+        userWithdrawalService.withdraw(userId, refreshToken);
+        return ResponseEntity.ok(ResponseUtils.createSuccessResponse(null));
+    }
 }

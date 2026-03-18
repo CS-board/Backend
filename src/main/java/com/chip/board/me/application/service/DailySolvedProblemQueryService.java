@@ -4,7 +4,7 @@ import com.chip.board.challenge.application.port.ChallengeLoadPort;
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
 import com.chip.board.me.application.port.DailySolvedProblemQueryPort;
-import com.chip.board.me.presentation.dto.response.DailySolvedProblemsResponse;
+import com.chip.board.me.presentation.dto.response.UserRecord.DailySolvedProblemsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
