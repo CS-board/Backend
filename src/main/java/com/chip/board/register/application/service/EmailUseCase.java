@@ -26,7 +26,7 @@ public class EmailUseCase {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     public void sendAuthCode(String email) {
-        if (userRepositoryPort.findByUsername(email).isPresent()) {
+        if (userRepositoryPort.findActiveByUsername(email).isPresent()) {
             throw new ServiceException(ErrorCode.USER_ALREADY_EXIST);
         }
 

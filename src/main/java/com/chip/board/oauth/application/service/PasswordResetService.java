@@ -30,7 +30,7 @@ public class PasswordResetService {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     public void sendResetCode(String email) {
-        User user = userRepositoryPort.findByUsername(email)
+        User user = userRepositoryPort.findActiveByUsername(email)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
         int code = SECURE_RANDOM.nextInt(900000) + 100000;
@@ -54,7 +54,7 @@ public class PasswordResetService {
             throw new ServiceException(ErrorCode.EMAIL_NOT_VERIFIED);
         }
 
-        User user = userRepositoryPort.findByUsername(email)
+        User user = userRepositoryPort.findActiveByUsername(email)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
         user.changePassword(passwordEncoder.encode(newPassword));

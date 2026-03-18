@@ -17,7 +17,7 @@ public class BaekjoonHandleValidationService {
 
     @Transactional(readOnly = true)
     public boolean validate(String handle) {
-        boolean alreadyUsed = userRepositoryPort.existsByBojId(handle);
+        boolean alreadyUsed = userRepositoryPort.existsActiveByBojId(handle);
         if (alreadyUsed) {
             throw new ServiceException(ErrorCode.DUPLICATE_BOJ_ID);
         }

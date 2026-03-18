@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE user SET is_deleted = true WHERE user_id = ?")
 @SQLRestriction("is_deleted = false")
 public class User {
 
@@ -37,7 +36,7 @@ public class User {
     @Column(nullable = false, length = 100)
     private String department;
 
-    @Column(name = "student_id", nullable = false, length = 20)
+    @Column(name = "student_id", nullable = false, length = 30)
     private String studentId;
 
     @Column(nullable = false)
@@ -115,5 +114,19 @@ public class User {
             throw new IllegalArgumentException("grade must be between 1 and 5");
         }
         this.grade = grade;
+    }
+
+    public void withdraw() {
+        if (this.deleted) {
+            throw new IllegalStateException("already deleted user");
+        }
+        if (this.id == null) {
+            throw new IllegalStateException("user id must not be null");
+        }
+
+        this.username = "deleted_" + this.id + "_" + this.username;
+        this.studentId = "deleted_" + this.id + "_" + this.studentId;
+        this.bojId = "deleted_" + this.id + "_" + this.bojId;
+        this.deleted = true;
     }
 }

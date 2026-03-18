@@ -15,14 +15,15 @@ import org.springframework.data.repository.query.Param;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByUsernameAndDeletedFalse(String username);
     Optional<User> findById(Long id);
-    boolean existsByBojId(String bojId);
+    boolean existsByBojIdAndDeletedFalse(String bojId);
 
     @Query("""
     select new com.chip.board.register.application.port.dto.ChallengeRankingRow(
         u.id,
         u.name,
+        u.grade,
         u.bojId,
         u.studentId,
         u.department,
@@ -47,7 +48,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 """)
     Page<ChallengeRankingRow> findRankingsAllUsers(@Param("challengeId") long challengeId, Pageable pageable);
 
-
+    boolean existsByStudentIdAndDeletedFalse(String studentId);
 
     long countByDeletedFalse();
 }

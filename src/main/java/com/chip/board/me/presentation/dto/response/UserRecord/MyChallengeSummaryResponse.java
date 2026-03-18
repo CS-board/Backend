@@ -1,4 +1,4 @@
-package com.chip.board.me.presentation.dto.response;
+package com.chip.board.me.presentation.dto.response.UserRecord;
 
 public record MyChallengeSummaryResponse(
         Integer currentRank,

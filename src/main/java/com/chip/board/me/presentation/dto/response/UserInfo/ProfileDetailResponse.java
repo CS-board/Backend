@@ -1,4 +1,6 @@
-package com.chip.board.me.presentation.dto.response;
+package com.chip.board.me.presentation.dto.response.UserInfo;
+
+import com.chip.board.register.domain.Role;
 
 public record ProfileDetailResponse(
         String name,
@@ -7,6 +9,7 @@ public record ProfileDetailResponse(
         int grade,
         String email,
         String bojId,
-        long goalPoints
+        long goalPoints,
+        Role role
 ) {
 }

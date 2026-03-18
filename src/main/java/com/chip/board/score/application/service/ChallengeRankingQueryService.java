@@ -24,23 +24,32 @@ public class ChallengeRankingQueryService {
     private final ChallengeLoadPort challengeLoadPort;
 
     public ChallengeRankingResponse getRankingsAllUsers(Long challengeId, int page, int size) {
-        if (challengeId == null) {
-            throw new ServiceException(ErrorCode.CHALLENGE_NOT_FOUND);
-
-        }
-        challengeLoadPort.findById(challengeId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.CHALLENGE_NOT_FOUND));
+        validateChallenge(challengeId);
 
         Pageable pageable = PageRequest.of(page, size);
-
         Page<ChallengeRankingRow> resultPage =
                 userRepositoryPort.findRankingsAllUsers(challengeId, pageable);
 
+        return toResponse(challengeId, resultPage);
+    }
+
+    private void validateChallenge(Long challengeId) {
+        if (challengeId == null) {
+            throw new ServiceException(ErrorCode.CHALLENGE_NOT_FOUND);
+        }
+
+        challengeLoadPort.findById(challengeId)
+                .orElseThrow(() -> new ServiceException(ErrorCode.CHALLENGE_NOT_FOUND));
+    }
+
+    private ChallengeRankingResponse toResponse(Long challengeId, Page<ChallengeRankingRow> resultPage) {
         List<ChallengeRankingItemResponse> items =
                 resultPage.getContent().stream()
-                        .map((ChallengeRankingRow r) -> new ChallengeRankingItemResponse(
+                        .map(r -> new ChallengeRankingItemResponse(
                                 r.currentRankNo(),
                                 r.name(),
+                                r.
+                                        grade(),
                                 r.bojId(),
                                 maskStudentId(r.studentId()),
                                 r.department(),
@@ -51,7 +60,6 @@ public class ChallengeRankingQueryService {
                         .toList();
 
         Instant generatedAt = Instant.now();
-
         boolean hasNext = resultPage.hasNext();
         int nextPage = hasNext ? resultPage.getNumber() + 1 : -1;
 

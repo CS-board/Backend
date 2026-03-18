@@ -2,10 +2,10 @@ package com.chip.board.me.application.service;
 
 import com.chip.board.global.base.exception.ServiceException;
 import com.chip.board.global.base.exception.ErrorCode;
-import com.chip.board.me.presentation.dto.response.ProfileDetailResponse;
-import com.chip.board.me.presentation.dto.response.UpdateDepartmentResponse;
-import com.chip.board.me.presentation.dto.response.UpdateGradeResponse;
-import com.chip.board.me.presentation.dto.response.ProfileResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.ProfileDetailResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.UpdateDepartmentResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.UpdateGradeResponse;
+import com.chip.board.me.presentation.dto.response.UserInfo.ProfileResponse;
 import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.domain.Department;
 import com.chip.board.register.domain.User;
@@ -31,7 +31,8 @@ public class UserProfileService {
                 user.getGrade(),
                 user.getUsername(),
                 user.getBojId(),
-                user.getGoalPoints()
+                user.getGoalPoints(),
+                user.getRole()
         );
     }
 
@@ -67,7 +68,8 @@ public class UserProfileService {
 
         return new ProfileResponse(
                 user.getName(),
-                user.getDepartment()
+                user.getDepartment(),
+                user.getRole()
         );
     }
 }

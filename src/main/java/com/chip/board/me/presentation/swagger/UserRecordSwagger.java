@@ -5,10 +5,10 @@ import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.config.swagger.SwaggerApiFailedResponse;
 import com.chip.board.global.config.swagger.SwaggerApiResponses;
 import com.chip.board.global.config.swagger.SwaggerApiSuccessResponse;
-import com.chip.board.me.presentation.dto.response.DailySolvedProblemsResponse;
-import com.chip.board.me.presentation.dto.response.MyChallengeSummaryResponse;
-import com.chip.board.me.presentation.dto.response.MyRecordSummaryResponse;
-import com.chip.board.me.presentation.dto.response.MyRecordWeeksResponse;
+import com.chip.board.me.presentation.dto.response.UserRecord.DailySolvedProblemsResponse;
+import com.chip.board.me.presentation.dto.response.UserRecord.MyChallengeSummaryResponse;
+import com.chip.board.me.presentation.dto.response.UserRecord.MyRecordSummaryResponse;
+import com.chip.board.me.presentation.dto.response.UserRecord.MyRecordWeeksResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 
 @Tag(name = "Me Record", description = "내 기록/챌린지 관련 API")
-public interface MeSwagger {
+public interface UserRecordSwagger {
 
     @Operation(
             summary = "일자별 풀이 문제 조회",

@@ -17,8 +17,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     private final UserRepository userRepository;
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> findActiveByUsername(String username) {
+        return userRepository.findByUsernameAndDeletedFalse(username);
     }
 
     @Override
@@ -27,8 +27,8 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
-    public boolean existsByBojId(String bojId) {
-        return userRepository.existsByBojId(bojId);
+    public boolean existsActiveByBojId(String bojId) {
+        return userRepository.existsByBojIdAndDeletedFalse(bojId);
     }
 
     @Override
@@ -44,5 +44,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public long countByDeletedFalse() {
         return userRepository.countByDeletedFalse();
+    }
+
+    @Override
+    public boolean existsActiveByStudentId(String studentId) {
+        return userRepository.existsByStudentIdAndDeletedFalse(studentId);
     }
 }

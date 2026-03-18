@@ -3,6 +3,7 @@ package com.chip.board.score.presentation.dto.response;
 public record ChallengeRankingItemResponse(
         Integer rankNo,      // current_rank_no (없으면 null)
         String name,
+        Integer grade,
         String bojId,
         String studentId,
         String department,
