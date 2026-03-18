@@ -21,7 +21,9 @@ public class UserWithdrawalService {
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
 
-        refreshTokenWriter.deleteByToken(rawRefreshToken);
+        if (rawRefreshToken != null) {
+            refreshTokenWriter.deleteByToken(rawRefreshToken);
+        }
 
         user.withdraw();
     }

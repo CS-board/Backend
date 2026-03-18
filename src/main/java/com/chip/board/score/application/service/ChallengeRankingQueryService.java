@@ -48,8 +48,7 @@ public class ChallengeRankingQueryService {
                         .map(r -> new ChallengeRankingItemResponse(
                                 r.currentRankNo(),
                                 r.name(),
-                                r.
-                                        grade(),
+                                r.grade(),
                                 r.bojId(),
                                 maskStudentId(r.studentId()),
                                 r.department(),

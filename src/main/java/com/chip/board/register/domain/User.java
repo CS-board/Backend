@@ -36,7 +36,7 @@ public class User {
     @Column(nullable = false, length = 100)
     private String department;
 
-    @Column(name = "student_id", nullable = false, length = 30)
+    @Column(name = "student_id", nullable = false, length = 100)
     private String studentId;
 
     @Column(nullable = false)
