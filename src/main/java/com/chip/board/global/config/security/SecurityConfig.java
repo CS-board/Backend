@@ -47,6 +47,8 @@ public class SecurityConfig {
             "/api/challenges/*/details",
             "/api/challenges/*/rankings",
             "/api/board/posts/**",
+            "/api/qna/questions",
+            "/api/qna/questions/*"
     };
 
     @Bean
@@ -66,8 +68,7 @@ public class SecurityConfig {
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers(ACTUATOR_WHITELIST).permitAll()
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .requestMatchers(PUBLIC_WHITELIST).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/qna/questions", "/api/qna/questions/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )
 
