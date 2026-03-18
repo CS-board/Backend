@@ -103,4 +103,9 @@ public class ChallengePersistenceAdapter implements ChallengeLoadPort, Challenge
                 agg.getLastUpdatedAt()
         );
     }
+
+    @Override
+    public List<Challenge> findAllByOrderByStartAtDesc() {
+        return challengeRepository.findAllByOrderByStartAtDesc();
+    }
 }

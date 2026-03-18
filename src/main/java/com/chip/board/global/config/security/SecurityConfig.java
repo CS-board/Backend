@@ -43,10 +43,10 @@ public class SecurityConfig {
     };
 
     private static final String[] PUBLIC_WHITELIST = {
-            "/api/challenges/*/info/**",
+            "/api/challenges",
+            "/api/challenges/*/details",
             "/api/challenges/*/rankings",
             "/api/board/posts/**",
-            "/api/board/posts/**"
     };
 
     @Bean

@@ -7,6 +7,7 @@ import com.chip.board.challenge.domain.Challenge;
 import com.chip.board.challenge.presentation.dto.request.ChallengeCreateRequest;
 import com.chip.board.challenge.presentation.dto.response.ChallengeInfoResponse;
 import com.chip.board.challenge.presentation.dto.response.ChallengeDetailInfoResponse;
+import com.chip.board.challenge.presentation.dto.response.ChallengeListItemResponse;
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -75,4 +77,12 @@ public class ChallengeCommandService {
                 agg.lastUpdatedAt()
         );
     }
+
+    public List<ChallengeListItemResponse> getChallengeList() {
+        return challengeLoadPort.findAllByOrderByStartAtDesc()
+                .stream()
+                .map(ChallengeListItemResponse::from)
+                .toList();
+    }
+
 }
