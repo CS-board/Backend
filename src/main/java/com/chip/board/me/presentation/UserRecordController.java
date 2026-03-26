@@ -3,24 +3,22 @@ package com.chip.board.me.presentation;
 import com.chip.board.global.base.dto.ResponseBody;
 import com.chip.board.global.base.dto.ResponseUtils;
 import com.chip.board.global.jwt.annotation.CurrentUserId;
-import com.chip.board.me.application.service.DailySolvedProblemQueryService;
+import com.chip.board.me.application.service.SolvedProblemQueryService;
 import com.chip.board.me.application.service.MyRecordQueryService;
-import com.chip.board.me.presentation.dto.response.UserRecord.DailySolvedProblemsResponse;
+import com.chip.board.me.presentation.dto.response.UserRecord.SolvedProblemsResponse;
 import com.chip.board.me.presentation.dto.response.UserRecord.MyChallengeSummaryResponse;
 import com.chip.board.me.presentation.dto.response.UserRecord.MyRecordSummaryResponse;
 import com.chip.board.me.presentation.dto.response.UserRecord.MyRecordWeeksResponse;
 import com.chip.board.me.presentation.swagger.UserRecordSwagger;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
 @Validated
@@ -29,16 +27,15 @@ import java.time.LocalDate;
 @RequestMapping("/api/me/records")
 public class UserRecordController implements UserRecordSwagger {
 
-    private final DailySolvedProblemQueryService dailySolvedProblemQueryService;
+    private final SolvedProblemQueryService dailySolvedProblemQueryService;
     private final MyRecordQueryService myRecordQueryService;
 
     @GetMapping("/{challengeId}/solved-problems")
-    public ResponseEntity<ResponseBody<DailySolvedProblemsResponse>> getDailySolvedProblems(
+    public ResponseEntity<ResponseBody<List<SolvedProblemsResponse>>> getSolvedProblems(
             @CurrentUserId Long userId,
-            @PathVariable Long challengeId,
-            @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+            @PathVariable Long challengeId
     ) {
-        DailySolvedProblemsResponse res = dailySolvedProblemQueryService.getDailySolvedProblems(userId, challengeId, date);
+        List<SolvedProblemsResponse> res = dailySolvedProblemQueryService.getSolvedProblems(userId, challengeId);
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(res));
     }
 

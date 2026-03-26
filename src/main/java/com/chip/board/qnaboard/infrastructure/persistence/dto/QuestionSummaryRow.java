@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public interface QuestionSummaryRow {
     Long getId();
     String getTitle();
+    String getAuthorStudentId();
     String getAuthorName();
     LocalDateTime getCreatedAt();
     boolean isSolved();

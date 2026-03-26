@@ -81,6 +81,7 @@ public class QuestionFacade {
         return new QuestionSummaryResponse(
                 row.getId(),
                 row.getTitle(),
+                row.getAuthorStudentId(),
                 row.getAuthorName(),
                 timeAgoFormatter.format(row.getCreatedAt()),
                 row.isSolved(),

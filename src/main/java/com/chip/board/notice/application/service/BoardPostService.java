@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class BoardPostService {
 
-    private static final int NEW_DAYS = 7;
+    private static final int NEW_DAYS = 1;
 
     private final BoardPostQueryPort queryPort;
     private final BoardPostCommandPort commandPort;
