@@ -11,10 +11,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SolvedProblemJdbcAdapter implements SolvedProblemQueryPort {
 
-    private final SolvedProblemJdbcRepository dailySolvedProblemJdbcRepository;
+    private final SolvedProblemJdbcRepository SolvedProblemJdbcRepository;
 
     @Override
     public List<Row> findByUserIdAndChallengeId(long userId, long challengeId) {
-        return dailySolvedProblemJdbcRepository.findByUserIdAndChallengeId(userId, challengeId);
+        return SolvedProblemJdbcRepository.findByUserIdAndChallengeId(userId, challengeId);
     }
 }

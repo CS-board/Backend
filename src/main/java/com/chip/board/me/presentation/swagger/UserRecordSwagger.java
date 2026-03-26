@@ -28,8 +28,7 @@ public interface UserRecordSwagger {
     @Operation(
             summary = "챌린지 시즌별 풀이 문제 조회",
             description = """
-                    로그인한 사용자가 특정 챌린지에서 날짜마다 푼 문제 목록을 조회합니다.
-                    - date는 ISO_DATE(yyyy-MM-dd) 형식입니다.
+                    로그인한 사용자가 특정 챌린지에서 날짜별로 묶인 풀이 문제 목록을 조회합니다.
                     """
     )
     @SwaggerApiResponses(

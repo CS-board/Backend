@@ -27,7 +27,7 @@ import java.util.List;
 @RequestMapping("/api/me/records")
 public class UserRecordController implements UserRecordSwagger {
 
-    private final SolvedProblemQueryService dailySolvedProblemQueryService;
+    private final SolvedProblemQueryService SolvedProblemQueryService;
     private final MyRecordQueryService myRecordQueryService;
 
     @GetMapping("/{challengeId}/solved-problems")
@@ -35,7 +35,7 @@ public class UserRecordController implements UserRecordSwagger {
             @CurrentUserId Long userId,
             @PathVariable Long challengeId
     ) {
-        List<SolvedProblemsResponse> res = dailySolvedProblemQueryService.getSolvedProblems(userId, challengeId);
+        List<SolvedProblemsResponse> res = SolvedProblemQueryService.getSolvedProblems(userId, challengeId);
         return ResponseEntity.ok(ResponseUtils.createSuccessResponse(res));
     }
 
