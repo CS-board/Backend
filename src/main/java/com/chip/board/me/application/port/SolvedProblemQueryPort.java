@@ -1,17 +1,11 @@
 package com.chip.board.me.application.port;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
-public interface DailySolvedProblemQueryPort {
+public interface SolvedProblemQueryPort {
 
-    List<Row> findByUserIdAndChallengeIdBetween(
-            long userId,
-            long challengeId,
-            LocalDateTime startInclusive,
-            LocalDateTime endExclusive
-    );
+    List<Row> findByUserIdAndChallengeId(long userId, long challengeId);
 
     record Row(
             int problemId,

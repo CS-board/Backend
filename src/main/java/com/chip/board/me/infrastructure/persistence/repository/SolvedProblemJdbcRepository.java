@@ -1,26 +1,23 @@
 package com.chip.board.me.infrastructure.persistence.repository;
 
-import com.chip.board.me.application.port.DailySolvedProblemQueryPort;
+import com.chip.board.me.application.port.SolvedProblemQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class DailySolvedProblemJdbcRepository {
+public class SolvedProblemJdbcRepository {
 
     private final JdbcTemplate jdbc;
 
-    public List<DailySolvedProblemQueryPort.Row> findByUserIdAndChallengeIdBetween(
+    public List<SolvedProblemQueryPort.Row> findByUserIdAndChallengeId(
             long userId,
-            long challengeId,
-            LocalDateTime startInclusive,
-            LocalDateTime endExclusive
+            long challengeId
     ) {
         String sql = """
             SELECT
@@ -38,14 +35,12 @@ public class DailySolvedProblemJdbcRepository {
               ON ts.level = se.level
             WHERE se.user_id = ?
               AND se.challenge_id = ?
-              AND se.created_at >= ?
-              AND se.created_at < ?
             ORDER BY se.created_at DESC
             """;
 
         return jdbc.query(
                 sql,
-                (rs, rowNum) -> new DailySolvedProblemQueryPort.Row(
+                (rs, rowNum) -> new SolvedProblemQueryPort.Row(
                         rs.getInt("problem_id"),
                         rs.getString("title_ko"),
                         rs.getInt("level"),
@@ -54,9 +49,7 @@ public class DailySolvedProblemJdbcRepository {
                         toInstant(rs.getTimestamp("solved_at"))
                 ),
                 userId,
-                challengeId,
-                Timestamp.valueOf(startInclusive),
-                Timestamp.valueOf(endExclusive)
+                challengeId
         );
     }
 

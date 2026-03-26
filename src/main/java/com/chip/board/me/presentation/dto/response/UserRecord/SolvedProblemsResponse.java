@@ -4,9 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
-public record DailySolvedProblemsResponse(
-        LocalDate date,
-        int count,
+public record SolvedProblemsResponse(
+        LocalDate solvedDate,
+        int dailySolvedCount,
         List<Item> items
 ) {
     public record Item(

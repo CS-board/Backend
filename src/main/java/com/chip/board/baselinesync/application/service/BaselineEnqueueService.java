@@ -16,7 +16,6 @@ public class BaselineEnqueueService implements BaselineEnqueuePort {
     @Override
     public void enqueueBaseline(long userId) {
         long now = System.currentTimeMillis();
-        log.info("enqueueBaseline userId={}, now={}", userId, now);
         jobQueuePort.scheduleAt(userId, now);
     }
 }

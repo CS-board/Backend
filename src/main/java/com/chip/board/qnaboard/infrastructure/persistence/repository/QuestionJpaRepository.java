@@ -15,12 +15,14 @@ public interface QuestionJpaRepository extends JpaRepository<Question, Long> {
         select
             q.id as id,
             q.title as title,
+            u.studentId as authorStudentId,
             q.authorName as authorName,
             q.createdAt as createdAt,
             q.solved as solved,
             (select count(c.id) from QuestionComment c where c.questionId = q.id and c.deleted = false) as commentCount,
             (select count(l.id) from QuestionLike l where l.questionId = q.id) as likeCount
         from Question q
+        join User u on u.id = q.authorId
         where q.deleted = false
         order by q.createdAt desc
     """)
