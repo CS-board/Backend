@@ -31,16 +31,16 @@ services:
     build: .
     image: tomato7000/earlybird-app:v1.0.22
     env_file:
-      - .env.prod
+      - .env.dev
     environment:
       TZ: Asia/Seoul
       DB_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-earlybird}?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
       REDIS_HOST: redis
       REDIS_PORT: 6379
       ACTUATOR_EXPOSE: health,info,prometheus
-      SWAGGER_ENABLED: "false"
-      SPRINGDOC_SWAGGER_UI_ENABLED: "false"
-      SPRINGDOC_API_DOCS_ENABLED: "false"
+      SWAGGER_ENABLED: "true"
+      SPRINGDOC_SWAGGER_UI_ENABLED: "true"
+      SPRINGDOC_API_DOCS_ENABLED: "true"
     ports:
       - "127.0.0.1:8080:8080"
     restart: unless-stopped

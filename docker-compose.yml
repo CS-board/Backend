@@ -1,13 +1,92 @@
 services:
+  db:
+    image: mysql:8.0
+    environment:
+      TZ: Asia/Seoul
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-earlybird}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
   app:
-    # local은 build로 덮어씀, prod는 image로 덮어씀
-    # build: .
-    # image: board:latest
-
+    build: .
+    image: earlybird-app:dev
     env_file:
-      - .env.prod
-
+      - .env.dev
+    environment:
+      TZ: Asia/Seoul
+      DB_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-earlybird}?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ACTUATOR_EXPOSE: health,info,prometheus
+      SWAGGER_ENABLED: "true"
+      SPRINGDOC_SWAGGER_UI_ENABLED: "true"
+      SPRINGDOC_API_DOCS_ENABLED: "true"
     ports:
       - "${SERVER_PORT:-8080}:8080"
-
     restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:v3.5.1
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_started
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      prometheus:
+        condition: service_started
+
+  # Future exporters:
+  # mysql-exporter:
+  #   image: prom/mysqld-exporter:<version>
+  # redis-exporter:
+  #   image: oliver006/redis_exporter:<version>
+
+volumes:
+  mysql-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:

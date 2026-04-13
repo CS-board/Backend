@@ -12,6 +12,7 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -21,7 +22,7 @@ import io.swagger.v3.core.converter.ResolvedSchema;
 
 @Component
 @RequiredArgsConstructor
-@Profile("!test && !prod")
+@ConditionalOnProperty(name = "swagger.enabled", havingValue = "true")
 public class SwaggerApiSuccessResponseHandler {
 
     public void handle(Operation operation, HandlerMethod handlerMethod) {

@@ -9,13 +9,13 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.method.HandlerMethod;
 
 @Configuration
-@Profile("!test")
+@ConditionalOnProperty(name = "swagger.enabled", havingValue = "true")
 public class SwaggerConfig {
     @Value("${swagger.server-url}")
     private String serverUrl;
