@@ -29,7 +29,7 @@ services:
 
   app:
     build: .
-    image: tomato7000/earlybird-app:v1.0.22
+    image: tomato7000/earlybird-app:${APP_VERSION:-latest}
     env_file:
       - .env.dev
     environment:
@@ -58,8 +58,6 @@ services:
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
-    ports:
-      - "9090:9090"
     restart: unless-stopped
     depends_on:
       app:
@@ -68,12 +66,12 @@ services:
   grafana:
     image: grafana/grafana:11.3.1
     environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     volumes:
       - grafana-data:/var/lib/grafana
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     restart: unless-stopped
     depends_on:
       prometheus:
