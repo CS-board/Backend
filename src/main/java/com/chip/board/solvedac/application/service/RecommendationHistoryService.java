@@ -97,8 +97,6 @@ public class RecommendationHistoryService {
             } catch (DataIntegrityViolationException e) {
                 // 동시에 저장 눌렀을 때(유니크 제약) -> skip 처리
                 skippedCount++;
-                log.debug("Saved problem skipped by data integrity violation. userId={}, problemId={}",
-                        userId, it.problemId());
             }
         }
 

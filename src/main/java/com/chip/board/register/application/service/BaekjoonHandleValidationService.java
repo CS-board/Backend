@@ -21,7 +21,6 @@ public class BaekjoonHandleValidationService {
     public boolean validate(String handle) {
         boolean alreadyUsed = userRepositoryPort.existsActiveByBojId(handle);
         if (alreadyUsed) {
-            log.debug("Baekjoon handle validation failed by duplicate handle. handle={}", handle);
             throw new ServiceException(ErrorCode.DUPLICATE_BOJ_ID);
         }
 

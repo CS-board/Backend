@@ -58,7 +58,6 @@ public class LoginService {
             return new TokenPair(accessToken, refreshToken);
 
         } catch (AuthenticationException e) {
-            log.debug("Login failed by authentication error. errorCode={}", ErrorCode.INVALID_LOGIN.getCode());
             throw new ServiceException(ErrorCode.INVALID_LOGIN);
         }
     }

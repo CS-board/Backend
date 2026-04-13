@@ -45,7 +45,6 @@ public class SolvedAcRandomProblemService {
         SolvedProblemPage page = solvedAcPort.searchProblemPageWithCountOrNull(query, 1, "random", "asc");
 
         if (page == null) {
-            log.warn("Random problem pick failed by solved.ac unavailable. userId={}", userId);
             throw new ServiceException(ErrorCode.SOLVED_AC_UNAVAILABLE);
         }
 
