@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.service.spi.ServiceException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -26,7 +25,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         } catch (ServiceException e) {
             handlerExceptionResolver.resolveException(request, response, null, e);
         } catch (Exception e) {
-            log.error("{}", e.getMessage(), e);
+            log.error("Filter exception. method={}, uri={}", request.getMethod(), request.getRequestURI(), e);
             handlerExceptionResolver.resolveException(request, response, null, e);
         }
     }

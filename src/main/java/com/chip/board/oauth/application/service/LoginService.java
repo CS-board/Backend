@@ -16,11 +16,13 @@ import com.chip.board.register.domain.Role;
 import com.chip.board.oauth.presentation.dto.request.LoginRequest;
 import com.chip.board.global.jwt.dto.response.TokenPair;
 import com.chip.board.register.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoginService {
@@ -52,6 +54,7 @@ public class LoginService {
             User user = userFinder.findById(userId);
             userWriter.onLoginSuccess(user);
 
+            log.info("Login succeeded. userId={}", userId);
             return new TokenPair(accessToken, refreshToken);
 
         } catch (AuthenticationException e) {

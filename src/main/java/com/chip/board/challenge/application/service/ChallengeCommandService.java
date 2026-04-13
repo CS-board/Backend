@@ -11,12 +11,14 @@ import com.chip.board.challenge.presentation.dto.response.ChallengeListItemRespo
 import com.chip.board.global.base.exception.ErrorCode;
 import com.chip.board.global.base.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChallengeCommandService {
@@ -43,6 +45,7 @@ public class ChallengeCommandService {
         }
 
         Challenge saved = challengeSavePort.save(new Challenge(req.title(), startAt, endAt));
+        log.info("Challenge created. challengeId={}", saved.getChallengeId());
         return ChallengeInfoResponse.from(saved);
     }
 
@@ -61,6 +64,7 @@ public class ChallengeCommandService {
 
     @Transactional(readOnly = true)
     public ChallengeDetailInfoResponse getDetailInfo(Long challengeId) {
+        log.debug("Challenge detail requested. challengeId={}", challengeId);
         Challenge challenge = challengeLoadPort.findById(challengeId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.CHALLENGE_NOT_FOUND));
 

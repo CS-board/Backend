@@ -61,10 +61,12 @@ public class RegisterUseCase {
 
         userRepositoryPort.save(user);
         userSolvedSyncPort.createInitialSyncState(user);
+        log.info("User registered. userId={}, handle={}", user.getId(), user.getBojId());
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
                 baselineEnqueuePort.enqueueBaseline(user.getId());
+                log.debug("Baseline sync enqueued after register commit. userId={}", user.getId());
             }
         });
     }

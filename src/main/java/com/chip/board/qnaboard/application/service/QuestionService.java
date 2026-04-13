@@ -12,6 +12,7 @@ import com.chip.board.qnaboard.infrastructure.persistence.dto.QuestionSummaryRow
 import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.domain.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class QuestionService {
@@ -36,6 +38,7 @@ public class QuestionService {
 
     @Transactional(readOnly = true)
     public QuestionQueryPort.QuestionDetailView getDetail(long questionId) {
+        log.debug("QnA question detail requested. questionId={}", questionId);
         return queryPort.findDetail(questionId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.QNA_QUESTION_NOT_FOUND));
     }
@@ -44,6 +47,7 @@ public class QuestionService {
     public long create(String title, String content, long userId) {
         User user = getUserOrThrow(userId);
         Question saved = commandPort.save(new Question(title, content, userId, user.getName()));
+        log.info("QnA question created. questionId={}, userId={}", saved.getId(), userId);
         return saved.getId();
     }
 
@@ -56,7 +60,9 @@ public class QuestionService {
     @Transactional
     public LikePort.ToggleResult toggleLike(long questionId, long userId) {
         validateQuestionExists(questionId);
-        return likePort.toggle(questionId, userId);
+        LikePort.ToggleResult result = likePort.toggle(questionId, userId);
+        log.debug("QnA question like toggled. questionId={}, userId={}", questionId, userId);
+        return result;
     }
 
     @Transactional
@@ -64,6 +70,7 @@ public class QuestionService {
         QuestionQueryPort.QuestionDetailView view = getDetail(questionId);
         validateOwnerOrAdmin(view, requesterId);
         commandPort.markSolved(questionId, solved);
+        log.info("QnA question solved status changed. questionId={}, userId={}", questionId, requesterId);
     }
 
     @Transactional
@@ -71,6 +78,7 @@ public class QuestionService {
         QuestionQueryPort.QuestionDetailView view = getDetail(questionId);
         validateOwnerOrAdmin(view, requesterId);
         commandPort.update(questionId, title, content);
+        log.info("QnA question updated. questionId={}, userId={}", questionId, requesterId);
     }
 
     @Transactional
@@ -78,6 +86,7 @@ public class QuestionService {
         QuestionQueryPort.QuestionDetailView view = getDetail(questionId);
         validateOwnerOrAdmin(view, requesterId);
         commandPort.softDelete(questionId);
+        log.info("QnA question deleted. questionId={}, userId={}", questionId, requesterId);
     }
 
     private User getUserOrThrow(long userId) {

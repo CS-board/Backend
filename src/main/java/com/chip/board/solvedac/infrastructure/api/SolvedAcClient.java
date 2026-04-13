@@ -79,7 +79,7 @@ public class SolvedAcClient implements SolvedAcPort {
         try {
            record429Cooldown();
              } catch (Exception e) {
-                log.warn("Failed to record 429 cooldown to DB", e);
+                log.warn("Failed to record 429 cooldown to DB. apiKey={}", API_KEY_SOLVED_AC, e);
             }
     }
     private void afterTransient(long now) { setGateMs(now + BACKOFF_5XX_NET_MS); }
@@ -251,16 +251,19 @@ public class SolvedAcClient implements SolvedAcPort {
         } catch (HttpClientErrorException e) {
             int code = e.getStatusCode().value();
             if (code == 429) after429(now); else afterOk(now);
+            log.warn("searchProblemPageWithCount 4xx. page={}, status={}", page, code);
             return null;
 
         } catch (HttpServerErrorException | ResourceAccessException e) {
             // 5xx or I/O(네트워크) 계열
             afterTransient(now);
+            log.warn("searchProblemPageWithCount transient. page={}", page, e);
             return null;
 
         } catch (RuntimeException e) {
             // 나머지 예상 못 한 런타임 예외
             afterTransient(now);
+            log.warn("searchProblemPageWithCount runtime. page={}", page, e);
             return null;
         }
     }

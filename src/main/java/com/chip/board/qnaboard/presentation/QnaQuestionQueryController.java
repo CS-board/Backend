@@ -28,7 +28,7 @@ public class QnaQuestionQueryController implements QnaQuestionQuerySwagger {
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size
     ) {
-        log.info("QnA list entered. page={}, size={}", page, size);
+        log.debug("QnA list requested. page={}, size={}", page, size);
         return ResponseEntity.ok(
                 ResponseUtils.createSuccessResponse(facade.list(page, size))
         );
