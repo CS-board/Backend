@@ -21,18 +21,19 @@ public class BaekjoonHandleValidationService {
     public boolean validate(String handle) {
         boolean alreadyUsed = userRepositoryPort.existsActiveByBojId(handle);
         if (alreadyUsed) {
+            log.info("Baekjoon handle validation failed: duplicate handle. handle={}", handle);
             throw new ServiceException(ErrorCode.DUPLICATE_BOJ_ID);
         }
 
         boolean cooldownActive = solvedAcPort.isCooldownActive();
         if (cooldownActive) {
-            log.debug("Baekjoon handle validation blocked by solved.ac cooldown. handle={}", handle);
+            log.info("Baekjoon handle validation blocked by solved.ac cooldown. handle={}", handle);
             throw new ServiceException(ErrorCode.SOLVEDAC_COOLDOWN_ACTIVE);
         }
 
         Integer solvedCount = solvedAcPort.fetchSolvedCountOrNull(handle);
         if (solvedCount == null) {
-            log.debug("Baekjoon handle validation failed by solved.ac response. handle={}", handle);
+            log.info("Baekjoon handle validation failed by solved.ac response. handle={}", handle);
             throw new ServiceException(ErrorCode.BAEKJOON_HANDLE_INVALID);
         }
         log.debug("Baekjoon handle validated. handle={}", handle);
