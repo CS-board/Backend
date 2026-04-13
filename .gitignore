@@ -42,6 +42,7 @@ docker-infra/
 # env files (secrets)
 .env
 .env.prod
+.env.dev
 
 
 

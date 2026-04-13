@@ -75,6 +75,9 @@ dependencies {
 
 	// Webclient
 	implementation "org.springframework:spring-webflux"
+
+	//prometheus
+	implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.named('test') {
