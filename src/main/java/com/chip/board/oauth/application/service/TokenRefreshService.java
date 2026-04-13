@@ -13,9 +13,11 @@ import com.chip.board.global.jwt.dto.response.TokenPair;
 import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.domain.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenRefreshService {
@@ -46,6 +48,7 @@ public class TokenRefreshService {
 
         refreshTokenWriter.save(newRefreshToken);
 
+        log.info("Token refreshed. userId={}", userId);
         return new TokenPair(newAccessToken, newRefreshToken);
     }
 

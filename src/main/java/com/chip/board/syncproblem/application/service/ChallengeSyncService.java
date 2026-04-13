@@ -69,6 +69,7 @@ public class ChallengeSyncService {
             Optional<Long> observeUserIdOpt = observeQueuePort.popDueUserId(now);
             if (observeUserIdOpt.isPresent()) {
                 long userId = observeUserIdOpt.get();
+                log.debug("Challenge observe job picked. challengeId={}, userId={}", snap.challengeId(), userId);
 
                 Optional<SyncTarget> tOpt =
                         tx.execute(st -> syncStateQueryPort.findObserveTarget(userId, windowStart));
@@ -79,6 +80,7 @@ public class ChallengeSyncService {
                 Integer solvedCount = solvedAcPort.fetchSolvedCountOrNull(t.bojHandle());
                 if (solvedCount == null) {
                     observeQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
+                    log.debug("Challenge observe job rescheduled. challengeId={}, userId={}", snap.challengeId(), userId);
                     return;
                 }
 
@@ -96,6 +98,7 @@ public class ChallengeSyncService {
             Optional<Long> deltaUserIdOpt = deltaJobQueuePort.popDueUserId(now);
             if (deltaUserIdOpt.isPresent()) {
                 long userId = deltaUserIdOpt.get();
+                log.debug("Challenge delta job picked. challengeId={}, userId={}", snap.challengeId(), userId);
 
                 Optional<DeltaPageTarget> deltaOpt =
                         tx.execute(st -> syncStateQueryPort.findDeltaTarget(userId, windowStart));
@@ -107,6 +110,8 @@ public class ChallengeSyncService {
                         solvedAcPort.fetchSolvedProblemPageOrNull(delta.bojHandle(), delta.nextPage());
                 if (items == null) {
                     deltaJobQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
+                    log.debug("Challenge delta job rescheduled. challengeId={}, userId={}, page={}",
+                            snap.challengeId(), userId, delta.nextPage());
                     return;
                 }
 
@@ -123,7 +128,11 @@ public class ChallengeSyncService {
                         })
                 );
 
-                if (needMore) deltaJobQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
+                if (needMore) {
+                    deltaJobQueuePort.scheduleAt(userId, solvedAcPort.nextAllowedAtMs());
+                    log.debug("Challenge delta job advanced. challengeId={}, userId={}, page={}",
+                            snap.challengeId(), userId, delta.nextPage());
+                }
                 return;
             }
 
@@ -155,9 +164,11 @@ public class ChallengeSyncService {
                 Challenge managed = challengeSavePort.getByIdForUpdate(snap.challengeId());
                 if (managed.getStatus() == ChallengeStatus.ACTIVE && !managed.isPrepareFinalized()) {
                     managed.finalizePrepare();
+                    log.info("Challenge prepare finalized. challengeId={}", snap.challengeId());
                 }
                 if (managed.getStatus() == ChallengeStatus.CLOSED && !managed.isCloseFinalized()) {
                     managed.finalizeClose();
+                    log.info("Challenge close finalized. challengeId={}", snap.challengeId());
                 }
             });
 

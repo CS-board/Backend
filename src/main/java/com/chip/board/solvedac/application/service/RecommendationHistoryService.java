@@ -10,6 +10,7 @@ import com.chip.board.solvedac.presentation.dto.request.SaveProblemsRequest;
 import com.chip.board.solvedac.presentation.dto.response.RecommendationHistoryResponse;
 import com.chip.board.solvedac.presentation.dto.response.SaveProblemsResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendationHistoryService {
@@ -95,9 +97,12 @@ public class RecommendationHistoryService {
             } catch (DataIntegrityViolationException e) {
                 // 동시에 저장 눌렀을 때(유니크 제약) -> skip 처리
                 skippedCount++;
+                log.debug("Saved problem skipped by data integrity violation. userId={}, problemId={}",
+                        userId, it.problemId());
             }
         }
 
+        log.info("Recommendation history saved. userId={}", userId);
         return new SaveProblemsResponse(savedCount, skippedCount, evictedCount, savedItems);
     }
 
@@ -121,11 +126,14 @@ public class RecommendationHistoryService {
                 .orElseThrow(() -> new ServiceException(ErrorCode.SAVED_PROBLEM_NOT_FOUND));
 
         savedProblemPort.delete(saved);
+        log.info("Recommendation history deleted. userId={}, savedId={}", userId, savedId);
     }
 
     @Transactional
     public long clear(Long userId) {
-        return savedProblemPort.deleteByUserId(userId);
+        long deletedCount = savedProblemPort.deleteByUserId(userId);
+        log.info("Recommendation history cleared. userId={}", userId);
+        return deletedCount;
     }
 
     private RecommendationHistoryResponse.Item toHistoryItem(SavedProblem e) {

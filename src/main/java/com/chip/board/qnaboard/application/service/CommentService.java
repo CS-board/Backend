@@ -9,9 +9,11 @@ import com.chip.board.register.application.port.UserRepositoryPort;
 import com.chip.board.register.domain.Role;
 import com.chip.board.register.domain.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -28,6 +30,7 @@ public class CommentService {
         QuestionComment saved = commentPort.save(
                 new QuestionComment(questionId, userId, user.getName(), content)
         );
+        log.info("QnA comment created. questionId={}, commentId={}, userId={}", questionId, saved.getId(), userId);
         return saved.getId();
     }
 
@@ -36,6 +39,7 @@ public class CommentService {
         QuestionComment comment = findAndValidateComment(questionId, commentId, requesterId);
 
         comment.changeContent(content); // dirty checking
+        log.info("QnA comment updated. questionId={}, commentId={}, userId={}", questionId, commentId, requesterId);
     }
 
     @Transactional
@@ -43,6 +47,7 @@ public class CommentService {
         QuestionComment comment = findAndValidateComment(questionId, commentId, requesterId);
 
         comment.softDelete(); // dirty checking
+        log.info("QnA comment deleted. questionId={}, commentId={}, userId={}", questionId, commentId, requesterId);
     }
 
     private QuestionComment findAndValidateComment(long questionId, long commentId, long requesterId){
